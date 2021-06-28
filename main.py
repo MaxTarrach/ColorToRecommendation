@@ -1,41 +1,122 @@
-from PyQt5 import QtWidgets # import PyQt5 widgets
-from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QGridLayout, QWidget
 import sys
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QGridLayout, QWidget, QLineEdit, QPushButton
+from PyQt5.QtGui import QPixmap
 import cv2
-import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
-import UI
+import numpy as np
+import  utils
+import VisualFeatureExtraction
+import matplotlib.pyplot as plt
+from PyQt5.QtChart import QChart, QChartView, QHorizontalBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
+from PyQt5.Qt import Qt
+from PyQt5.QtGui import QPainter
 
-### Variables ###
-# Image file to analyze
-file = '/Users/maximiliantarrach/Documents/Bilder/test.jpeg'
 
 cluster_centers = 4
 
+image_file = "/Users/maximiliantarrach/Documents/Bilder/test.jpeg"
+
 
 class Example(QWidget):
-    # Create the application object
-    app = QtWidgets.QApplication(sys.argv)
 
-    # Create the form object
-    first_window = QtWidgets.QWidget()
-
-    first_window.text = QLabel('Hallo')
-
-    first_window.Grid = QGridLayout
-
-    first_window.grid.addWidget(first_window.text, 2, 1)
+    def __init__(self):
+        super().__init__()
 
 
-    # Set window size
-    first_window.resize(UI.x_Window_Size, UI.y_Window_Size)
+        image = VisualFeatureExtraction.read_and_convert_to_rgb(image_file)
 
-    # Set the form title
-    first_window.setWindowTitle("Color to music recommendation system")
+        VisualFeatureExtraction.convert_rgb_to_grayscale(image)
 
-    # Show form
-    first_window.show()
+        image = VisualFeatureExtraction.reshape_imgdata(image)
 
-    # Run the program
-    sys.exit(app.exec())
+
+
+        #cluster the pixels
+        clt = KMeans(n_clusters= cluster_centers)
+        clt.fit(image)
+
+        # build a histogram of clusters and then create a figure
+        # representing the number of pixels labeled to each color
+        hist = utils.centroid_histogram(clt)
+
+        print(hist)
+        print(clt.cluster_centers_)
+
+        x = VisualFeatureExtraction.weighted_rgb_score(clt.cluster_centers_, hist)
+
+        x = utils.transfrom_255_to_1(x)
+
+        y = VisualFeatureExtraction.convert_rgb_to_hsv(x)
+
+        print(x)
+
+        print(y)
+
+        #Image load and label creation
+        self.im = QPixmap(image_file)
+        self.label = QLabel()
+        self.label.setPixmap(self.im)
+
+
+
+
+        #Create Horizontal bar graph
+
+        set0 = QBarSet('Color 1')
+        set1 = QBarSet('Color 2')
+        set2 = QBarSet('Color 3')
+        set3 = QBarSet('Color 4')
+
+        set0.append([4])
+        set1.append([3])
+        set2.append([2])
+        set3.append([1])
+
+        series = QHorizontalBarSeries()
+        series.append(set0)
+        series.append(set1)
+        series.append(set2)
+        series.append(set3)
+
+        chart = QChart()
+        chart.addSeries(series)
+        chart.setTitle('Color Cluster Plot')
+
+
+
+        self.text = QLabel('Colorcodes')
+
+        self.textFileLoader = QLabel('Select File')
+        self.lineFileLoader = QLineEdit(image_file)
+        self.buttonFileLoader = QPushButton('Open...')
+
+        #Grid creation
+        self.grid = QGridLayout()
+        #Add elements to grid
+        self.grid.addWidget(self.textFileLoader,1,1)
+        self.grid.addWidget(self.lineFileLoader,1,2)
+        self.grid.addWidget(self.buttonFileLoader,1,3)
+        self.grid.addWidget(self.label,2,1,1,3)
+        self.grid.addWidget(self.text,3,1,1,4)
+
+        self.setLayout(self.grid)
+
+        #Window initiation
+        self.setGeometry(50,50,1280,820)
+        self.setWindowTitle("PyQT show image")
+        self.show()
+
+        bar = utils.plot_colors(hist, clt.cluster_centers_)
+
+        # show our color bart
+        plt.figure()
+        plt.axis("off")
+        plt.imshow(bar)
+        plt.show()
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    ex = Example()
+
+    sys.exit(app.exec_())
