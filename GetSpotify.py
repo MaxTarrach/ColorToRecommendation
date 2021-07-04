@@ -3,50 +3,81 @@
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import pandas as np
+import re
+from pprint import pprint
+import json
 
 # get a playlist and get features needed for analysis
 
 clientID = 'ccc96fcbf06745cd83257810bec7192d'
 clientSecret = '18a8ee1b57b14c0cb1beceeeb82fd393'
 
-playlistLink = '0cubuWEaRYj2CUCOSkfrIq'
 
+username = '11134845287'
+playlist = '0cubuWEaRYj2CUCOSkfrIq'
 
 
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=clientID, client_secret=clientSecret))
-
-song_features1 = sp.audio_features('0nqL2NizWKtQDpmr4A89eL')
-
-song_features2 = sp.audio_features('5FXhWNvWuYk9cuEnS6K9PV')
-
-song_features3 = sp.audio_features('1vjmuZ6Avr9H4tNoD74FXL')
-
-
-#Dataframe aus Song/Playlist erstellen
-
-def get_dataframe_for_playlist(test):
-
-    d = {'energy': [0.154, 0.28, 0.117], 'key': [4, 2, 2], 'loudness': [-16.712, -18.539, -17.217], 'mode': [0, 1, 1],
-         'valence': [0.0573, 0.569, 0.15], 'tempo': [72.691, 119.176, 134.839]}
-
-    df = np.DataFrame(data=d)
-
-    print(test)
-    return df
-
 
 def add_function(x):
     return 5 * x
 
 
-print(get_dataframe_for_playlist(0))
 
+# get song ids from playlist
 
-# id of every song from playlist
+def extract_song_ids(playlist):
 
-def get_ids_from_playlist(playlistID):
+    sp_playlist = sp.playlist_items(playlist_id=playlist, fields='items.track.id', limit=100, offset=0, market=None,
+                                    additional_types=['track'])
+    tracks = sp_playlist['items']
 
     array_of_ids = [];
 
+    for i in tracks:
+        j = i.get('track')
+        iden = j.get('id')
+
+        array_of_ids.append(iden)
 
     return array_of_ids;
+
+# Create a DataFrame with audio features from an array of song ids
+
+def get_song_features(array_of_ids):
+
+    energy_array = [];
+    key_array = [];
+    loudness_array = [];
+    mode_array = [];
+    valence_array = [];
+    tempo_array = [];
+
+    af = sp.audio_features(extract_song_ids(playlist))
+
+    for i in range(len(array_of_ids)):
+
+        energy_array.append(af[i].get('energy'))
+        key_array.append(af[i].get('key'))
+        loudness_array.append(af[i].get('loudness'))
+        mode_array.append(af[i].get('mode'))
+        valence_array.append(af[i].get('valence'))
+        tempo_array.append(af[i].get('tempo'))
+
+        d = {'energy': energy_array, 'key': key_array, 'loudness': loudness_array, 'mode': mode_array,
+         'valence': valence_array, 'tempo': tempo_array}
+
+    df = np.DataFrame(data=d)
+    return df
+
+
+print(get_song_features(extract_song_ids(playlist)))
+
+
+#print(type(song_features1))
+
+#print(song_features1[0])
+
+#print(song_features1)
+
+#print(extract_song_ids(playlist))
