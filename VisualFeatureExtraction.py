@@ -14,7 +14,6 @@ image_file = "/Users/maximiliantarrach/Documents/Bilder/test.jpeg"
 
 
 
-
 def create_cluster(filepath, cluster_centers):
     img = cv2.imread(filepath)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -119,8 +118,6 @@ def weighted_rgb_score(rgb_values, weights):
 
     all_centers_rgb = [red_value, green_value, blue_value];
 
-    print('R :',  all_centers_rgb[0], 'G : ', all_centers_rgb[1], 'B : ', all_centers_rgb[2])
-
     # (r0 * w0) + (r1 * w1) + (r2 * w2) + (r3 * w3) = rweighted
     # (g0 * w0) + (g1 * w1) + (g2 * w2) + (g3 * w3) = gweighted
     # (b0 * w0) + (b1 * w1) + (b2 * w2) + (b3 * w3) = bweighted
@@ -153,8 +150,6 @@ def features_image (filepath, clt, hist):
     return image_vector;
 
 
-
-
 # build a histogram of clusters and then create a figure
 # representing the number of pixels labeled to each color
 #hist = VisualFeatureExtraction.create_hist(clt)
@@ -164,3 +159,6 @@ def features_image (filepath, clt, hist):
 #x = utils.transfrom_255_to_1(x)
 
 #y = VisualFeatureExtraction.convert_rgb_to_hsv(x)
+
+
+x = features_image(image_file, create_cluster(image_file,cluster_centers).cluster_centers_,create_hist(create_cluster(image_file,cluster_centers)))
