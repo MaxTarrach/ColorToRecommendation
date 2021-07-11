@@ -19,10 +19,6 @@ playlist = '0cubuWEaRYj2CUCOSkfrIq'
 
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=clientID, client_secret=clientSecret))
 
-def add_function(x):
-    return 5 * x
-
-
 
 # get song ids from playlist
 
@@ -52,6 +48,7 @@ def get_song_features(array_of_ids):
     mode_array = [];
     valence_array = [];
     tempo_array = [];
+    id_array = [];
 
     af = sp.audio_features(extract_song_ids(playlist))
 
@@ -63,15 +60,13 @@ def get_song_features(array_of_ids):
         mode_array.append(af[i].get('mode'))
         valence_array.append(af[i].get('valence'))
         tempo_array.append(af[i].get('tempo'))
+        id_array.append(array_of_ids[i])
 
         d = {'energy': energy_array, 'key': key_array, 'loudness': loudness_array, 'mode': mode_array,
-         'valence': valence_array, 'tempo': tempo_array}
+         'valence': valence_array, 'tempo': tempo_array, 'id': id_array}
 
     df = np.DataFrame(data=d)
     return df
-
-
-print(get_song_features(extract_song_ids(playlist)))
 
 
 #print(type(song_features1))

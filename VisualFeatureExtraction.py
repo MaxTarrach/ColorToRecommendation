@@ -1,11 +1,42 @@
 # imports
 import cv2
 import colorsys
-
+from sklearn.cluster import KMeans
+import  utils
+import numpy as np
+from main import *
 
 #Variablen
 
 cluster_centers = 4;
+
+image_file = "/Users/maximiliantarrach/Documents/Bilder/test.jpeg"
+
+
+
+def create_cluster(filepath, cluster_centers):
+    img = cv2.imread(filepath)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    img = img.reshape((img.shape[0] * img.shape[1], 3))
+
+    # cluster the pixels
+    clt = KMeans(n_clusters=cluster_centers)
+    clt.fit(img)
+
+    return clt;
+
+def create_hist(clt):
+    # grab the number of different clusters and create a histogram
+    # based on the number of pixels assigned to each cluster
+    numLabels = np.arange(0, len(np.unique(clt.labels_)) + 1)
+    (hist, _) = np.histogram(clt.labels_, bins=numLabels)
+    # normalize the histogram, such that it sums to one
+    hist = hist.astype("float")
+    hist /= hist.sum()
+    # return the histogram
+    return hist
+
 
 
 def read_and_convert_to_rgb(filepath):
@@ -36,13 +67,12 @@ def convert_rgb_to_hsv(rgb_values):
 
 
 def convert_rgb_to_hls(rgb_values):
-    hsl_values = 1;
+    hsl_values = colorsys.rgb_to_hls(rgb_values[0],rgb_values[1],rgb_values[2]);
 
     return hsl_values;
 
 
-#Grayscale image funktioniert!
-
+# Grayscale image funktioniert!
 
 def convert_rgb_to_grayscale(rgb_values):
 
@@ -59,6 +89,21 @@ def get_yellow_value_of_rgb():
 
     return yellow_value;
 
+def get_brightness_value_of_rgb(filepath):
+
+
+    img = cv2.imread(filepath)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    img = img.reshape((img.shape[0] * img.shape[1], 3))
+
+    cols, rows = img.shape
+
+    brightness = np.sum(img) / (255* cols * rows)
+
+    return brightness;
+
+
 
 def weighted_rgb_score(rgb_values, weights):
 
@@ -73,10 +118,47 @@ def weighted_rgb_score(rgb_values, weights):
 
     all_centers_rgb = [red_value, green_value, blue_value];
 
-    print('R :',  all_centers_rgb[0], 'G : ', all_centers_rgb[1], 'B : ', all_centers_rgb[2])
-
     # (r0 * w0) + (r1 * w1) + (r2 * w2) + (r3 * w3) = rweighted
     # (g0 * w0) + (g1 * w1) + (g2 * w2) + (g3 * w3) = gweighted
     # (b0 * w0) + (b1 * w1) + (b2 * w2) + (b3 * w3) = bweighted
 
     return all_centers_rgb;
+
+'''collect all features needed'''
+
+# Weighted rgb values
+
+
+def features_image (filepath, clt, hist):
+
+    # rgb value
+
+    rgb = weighted_rgb_score(clt,hist)
+
+    rgb = utils.transfrom_255_to_1(rgb)
+
+    # saturation
+
+    saturation = convert_rgb_to_hsv(rgb)[1]
+
+    # brightness
+
+    brightness = get_brightness_value_of_rgb(filepath)
+
+    image_vector = [rgb[0], rgb[1], rgb[2], saturation, brightness]
+
+    return image_vector;
+
+
+# build a histogram of clusters and then create a figure
+# representing the number of pixels labeled to each color
+#hist = VisualFeatureExtraction.create_hist(clt)
+
+#x = VisualFeatureExtraction.weighted_rgb_score(clt.cluster_centers_, hist)
+
+#x = utils.transfrom_255_to_1(x)
+
+#y = VisualFeatureExtraction.convert_rgb_to_hsv(x)
+
+
+x = features_image(image_file, create_cluster(image_file,cluster_centers).cluster_centers_,create_hist(create_cluster(image_file,cluster_centers)))
