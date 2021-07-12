@@ -69,10 +69,21 @@ def get_song_features(array_of_ids):
     return df
 
 
-#print(type(song_features1))
+def song_name_display(id):
 
-#print(song_features1[0])
+    title = sp.track(id).get('name')
 
-#print(song_features1)
+    return title;
 
-#print(extract_song_ids(playlist))
+
+def song_artist_display(id):
+
+    name = sp.track(id).get('artist')
+
+    return name;
+
+print(sp.track('1vjmuZ6Avr9H4tNoD74FXL'))
+
+print(song_name_display('1vjmuZ6Avr9H4tNoD74FXL'))
+
+print(song_artist_display('1vjmuZ6Avr9H4tNoD74FXL'))

@@ -1,9 +1,11 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QGridLayout, QWidget, QLineEdit, QPushButton
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QGridLayout, QWidget, QLineEdit, QPushButton, QListWidget
 from PyQt5.QtGui import QPixmap
 import cv2
 from sklearn.cluster import KMeans
 import numpy as np
+import RecommendationModel
+import GetSpotify
 import  utils
 import VisualFeatureExtraction
 import matplotlib.pyplot as plt
@@ -28,12 +30,17 @@ class MainWIndow(QWidget):
         self.label.setPixmap(self.im)
         # Align center
 
-        self.text = QLabel('Colorcodes')
-        self.text.setStyleSheet('QLabel {background-color: red;}')
+        self.listWidget = QListWidget()
 
-        self.text1 = QLabel('Hallo1')
-        self.text2 = QLabel('Hallo2')
-        self.text3 = QLabel('Hallo3')
+        self.listWidget.insertItem(0, GetSpotify.song_name_display(str(RecommendationModel.sorted_songs[0][6])) + '    '+ str(RecommendationModel.sorted_songs[0][7]))
+        self.listWidget.insertItem(1, GetSpotify.song_name_display(str(RecommendationModel.sorted_songs[1][6])) + '    '+ str(RecommendationModel.sorted_songs[1][7]))
+        self.listWidget.insertItem(2, GetSpotify.song_name_display(str(RecommendationModel.sorted_songs[2][6])) + '    '+ str(RecommendationModel.sorted_songs[2][7]))
+
+        print(RecommendationModel.sorted_songs)
+
+        self.text1 = QLabel('Titel')
+        self.text2 = QLabel('Interpret')
+        self.text3 = QLabel('Match rating')
 
 
         self.textFileLoader = QLabel('Select File')
@@ -48,10 +55,10 @@ class MainWIndow(QWidget):
         self.grid.addWidget(self.lineFileLoader, 1, 2)
         self.grid.addWidget(self.buttonFileLoader, 1, 3)
         self.grid.addWidget(self.label, 2, 2, 1, 3)
-        self.grid.addWidget(self.text, 3, 1, 1, 4)
         self.grid.addWidget(self.text1, 4,1)
         self.grid.addWidget(self.text2, 4, 2)
         self.grid.addWidget(self.text3, 4, 3)
+        self.grid.addWidget(self.listWidget, 5, 1, 1, 3)
 
         self.setLayout(self.grid)
 
