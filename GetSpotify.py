@@ -14,7 +14,7 @@ clientSecret = '18a8ee1b57b14c0cb1beceeeb82fd393'
 
 
 username = '11134845287'
-playlist = '0cubuWEaRYj2CUCOSkfrIq'
+playlist = '4K3yubjGG0v3ZLacfEWsZL'
 
 
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=clientID, client_secret=clientSecret))

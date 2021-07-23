@@ -16,7 +16,7 @@ from PyQt5.QtGui import QPainter
 
 cluster_centers = 4
 
-image_file = "/Users/maximiliantarrach/Documents/Bilder/blade_runner_2.jpeg"
+image_file = "/Users/maximiliantarrach/Documents/Bilder/blade_runner.jpeg"
 
 
 class MainWIndow(QWidget):
@@ -32,9 +32,9 @@ class MainWIndow(QWidget):
 
         self.listWidget = QListWidget()
 
-        self.listWidget.insertItem(0, GetSpotify.song_name_display(str(RecommendationModel.sorted_songs[0][6])) + '    '+ str(RecommendationModel.sorted_songs[0][7]))
-        self.listWidget.insertItem(1, GetSpotify.song_name_display(str(RecommendationModel.sorted_songs[1][6])) + '    '+ str(RecommendationModel.sorted_songs[1][7]))
-        self.listWidget.insertItem(2, GetSpotify.song_name_display(str(RecommendationModel.sorted_songs[2][6])) + '    '+ str(RecommendationModel.sorted_songs[2][7]))
+        for i in range(len(RecommendationModel.sorted_songs)):
+            self.listWidget.insertItem(i, GetSpotify.song_name_display(
+                str(RecommendationModel.sorted_songs[i][6])) + '    ' + str(RecommendationModel.sorted_songs[i][7]))
 
         print(RecommendationModel.sorted_songs)
 
