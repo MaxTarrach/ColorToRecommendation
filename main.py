@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QGridLayout, QWidget, QLineEdit, QPushButton, QListWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QGridLayout, QWidget, QLineEdit, QPushButton, QListWidget, QMessageBox
 from PyQt5.QtGui import QPixmap
 import cv2
 from sklearn.cluster import KMeans
@@ -9,6 +9,7 @@ import GetSpotify
 import  utils
 import VisualFeatureExtraction
 import matplotlib.pyplot as plt
+from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtChart import QChart, QChartView, QHorizontalBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
 from PyQt5.Qt import Qt
 from PyQt5.QtGui import QPainter
@@ -16,8 +17,7 @@ from PyQt5.QtGui import QPainter
 
 cluster_centers = 4
 
-image_file = "/Users/maximiliantarrach/Documents/Bilder/blade_runner.jpeg"
-
+image_file = '/Users/maximiliantarrach/Documents/Bilder/blade_runner.jpeg'
 
 class MainWIndow(QWidget):
 
@@ -43,9 +43,14 @@ class MainWIndow(QWidget):
         self.text3 = QLabel('Match rating')
 
 
-        self.textFileLoader = QLabel('Select File')
-        self.lineFileLoader = QLineEdit(image_file)
+
+        # Load image file
+        self.textFileLoader = QLabel('Select Image File')
+        self.lineFileLoader = QLineEdit(self)
         self.buttonFileLoader = QPushButton('Open...')
+
+        self.buttonFileLoader.clicked.connect(lambda: self.button_click(self.lineFileLoader.text()))
+
 
         # Grid creation
         self.grid = QGridLayout()
@@ -55,7 +60,7 @@ class MainWIndow(QWidget):
         self.grid.addWidget(self.lineFileLoader, 1, 2)
         self.grid.addWidget(self.buttonFileLoader, 1, 3)
         self.grid.addWidget(self.label, 2, 2, 1, 3)
-        self.grid.addWidget(self.text1, 4,1)
+        self.grid.addWidget(self.text1, 4, 1)
         self.grid.addWidget(self.text2, 4, 2)
         self.grid.addWidget(self.text3, 4, 3)
         self.grid.addWidget(self.listWidget, 5, 1, 1, 3)
@@ -76,10 +81,10 @@ class MainWIndow(QWidget):
         plt.imshow(bar)
         plt.show()
 
-
-class SecondaryWindow:
-    def __init__(self, parent:None):
-        super(SecondaryWindow, self).__init__(parent)
+    @pyqtSlot()
+    def button_click(self, text):
+        shost = text
+        print(shost)
 
 
 if __name__ == '__main__':
