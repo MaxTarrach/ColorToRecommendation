@@ -14,7 +14,8 @@ clientSecret = '18a8ee1b57b14c0cb1beceeeb82fd393'
 
 
 username = '11134845287'
-playlist = '0cubuWEaRYj2CUCOSkfrIq'
+playlist = '4K3yubjGG0v3ZLacfEWsZL'
+
 
 
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=clientID, client_secret=clientSecret))
@@ -69,10 +70,23 @@ def get_song_features(array_of_ids):
     return df
 
 
-#print(type(song_features1))
+def song_name_display(id):
 
-#print(song_features1[0])
+    title = sp.track(id).get('name')
 
-#print(song_features1)
+    return title;
 
-#print(extract_song_ids(playlist))
+
+def song_artist_display(id):
+
+    name = sp.track(id).get('artist')
+
+    return name;
+
+
+
+print(sp.track('1vjmuZ6Avr9H4tNoD74FXL'))
+
+print(song_name_display('1vjmuZ6Avr9H4tNoD74FXL'))
+
+print(song_artist_display('1vjmuZ6Avr9H4tNoD74FXL'))

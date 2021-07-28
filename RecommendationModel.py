@@ -1,21 +1,8 @@
 import numpy
+import math
 from GetSpotify import *
 
 from VisualFeatureExtraction import *
-
-# Euklidische Distanz zwishen Vektoren
-
-# Standartisiert Vektoren
-
-# imageArray = [red, blue, green, yellow, sättigung, brightness, lightness]
-
-
-# Aufgabe = Erstes einfaches Model
-
-# import image vector with all visual features needed
-
-image = numpy.array((0.873, 0.44, 0.005, 0.4375, 0.99))
-
 
 #import playlist dataframe with all audio features needed
 
@@ -28,15 +15,19 @@ visual_np = numpy.array(df_visual)
 
 songs_np = df_songs.to_numpy()
 
-# Linear Mapping key ( x = key / 11)
 
-songs_np[0, 1] = songs_np[0, 1] / 11
-print(songs_np[0, 1])
-songs_np[1, 1] = songs_np[1, 1] / 11
-print(songs_np[1, 1])
-songs_np[2, 1] = songs_np[2, 1] / 11
-print(songs_np[2, 1])
+def normalize_songs(songVectors):
 
+    for i in range(len(songVectors)):
+
+        songVectors[i, 1] = songVectors[i, 1] / 11
+        songVectors[i, 2] = songVectors[i, 2] / 60+1
+        songVectors[i, 5] = songVectors[i, 5] / 200
+
+    return songVectors
+
+
+norm_songs = normalize_songs(songs_np)
 
 # calculate distance between visual features of image and every song
 
@@ -46,14 +37,95 @@ def calculate_distance(imageVector, songVectors):
 
     for i in range(len(songVectors)):
 
-        # image vector - song vectors
-        distance = imageVector[4] - songVectors[i, 1]
+        # brightness - key
+        brightness_key = imageVector[4] - songVectors[i, 1]
+        print('index:', i, 'img:', imageVector[4], 'song:', songVectors[i,1])
+        # brightness - tempo
+        brightness_tempo = imageVector[4] - songVectors[i, 5]
+        print('index:', i, 'img:', imageVector[4], 'song:', songVectors[i, 5])
+        # brightnes - loudness
+        brightness_loudness = imageVector[4] - songVectors[i, 2]
+        print('index:', i, 'img:', imageVector[4], 'song:', songVectors[i, 2])
+        # saturation - tempo
+        saturation_tempo = imageVector[4] - songVectors[i, 5]
+        print('index:', i, 'img:', imageVector[4], 'song:', songVectors[i, 5])
+        # blue - mode (minor)
+        blue_key = imageVector[2] - songVectors[i, 1]
+        print('index:', i, 'img:', imageVector[2], 'song:', songVectors[i, 1])
+
+        # yellow - key (major)
+
+        #advanced calculation
+
+
+        # primitive calculation
+        distance = abs(brightness_key) + abs(brightness_tempo) + abs(brightness_loudness) + abs(saturation_tempo) + abs(blue_key)
 
         distance_measures.append(distance)
 
     return distance_measures;
 
 
-distances = calculate_distance(visual_np, songs_np)
+def calculate_distances_2 (imageVector, songVectors):
 
-print(distances)
+    distance_measures = []
+
+    for i in range(len(songVectors)):
+
+        # euklidische Distanz für bild # jeden einzelnen song
+        brightness_key = (imageVector[4] - songVectors[i, 1])**2
+
+        brightness_tempo = (imageVector[4] - songVectors[i, 5])**2
+        print('index:', i, 'img:', imageVector[4], 'song:', songVectors[i, 5])
+        # brightnes - loudness
+        brightness_loudness = (imageVector[4] - songVectors[i, 2])**2
+        print('index:', i, 'img:', imageVector[4], 'song:', songVectors[i, 2])
+        # saturation - tempo
+        saturation_tempo = (imageVector[4] - songVectors[i, 5])**2
+        print('index:', i, 'img:', imageVector[4], 'song:', songVectors[i, 5])
+        # blue - mode (minor)
+        blue_key = (imageVector[2] - songVectors[i, 1])**2
+
+        distance = math.sqrt(brightness_key + brightness_tempo + brightness_loudness + saturation_tempo + blue_key)
+
+        distance = 1 / (1 + distance)
+
+        distance_measures.append(distance)
+
+    return distance_measures;
+
+# distances 2 with new distance measure
+
+
+#
+# COMMING SOON
+#
+
+
+distances = calculate_distances_2(visual_np, norm_songs)
+
+a = numpy.array(distances)
+
+a_np = []
+
+for i in range(len(a)):
+
+    a_np.append([a[i]])
+
+
+# add distances to arrays
+
+added = numpy.append(norm_songs, a_np, 1)
+
+# sort array
+
+sorted_songs = added[added[:, 7].argsort()]
+
+
+# Nicer to look at rating than just the pure distance
+
+def calculate_rating():
+    ratings = []
+
+    return ratings;
+

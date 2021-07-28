@@ -8,9 +8,8 @@ from main import *
 
 #Variablen
 
-cluster_centers = 4;
 
-image_file = "/Users/maximiliantarrach/Documents/Bilder/test.jpeg"
+image_file = "/Users/maximiliantarrach/Documents/Bilder/blade_runner.jpeg"
 
 
 
