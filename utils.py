@@ -30,3 +30,9 @@ def transfrom_255_to_1(value):
     value_0_to_1= [r,g,b]
 
     return value_0_to_1
+
+
+def handle_spotify_link(link):
+    link= ''
+
+    return link

@@ -17,6 +17,7 @@ username = '11134845287'
 playlist = '4K3yubjGG0v3ZLacfEWsZL'
 
 
+
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=clientID, client_secret=clientSecret))
 
 
@@ -81,6 +82,8 @@ def song_artist_display(id):
     name = sp.track(id).get('artist')
 
     return name;
+
+
 
 print(sp.track('1vjmuZ6Avr9H4tNoD74FXL'))
 
