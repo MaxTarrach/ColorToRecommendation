@@ -14,16 +14,26 @@ clientSecret = '18a8ee1b57b14c0cb1beceeeb82fd393'
 
 
 username = '11134845287'
-playlist = '4K3yubjGG0v3ZLacfEWsZL'
-
 
 
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=clientID, client_secret=clientSecret))
 
 
+def get_playlist_id(playlist_string):
+
+    start = playlist_string.find('https://open.spotify.com/playlist/') + len('https://open.spotify.com/playlist/')
+    end = playlist_string.find('?')
+
+    playlist_id = playlist_string[start:end]
+
+    return playlist_id;
+
+
 # get song ids from playlist
 
-def extract_song_ids(playlist):
+def extract_song_ids(playlist_string):
+
+    playlist = get_playlist_id(playlist_string)
 
     sp_playlist = sp.playlist_items(playlist_id=playlist, fields='items.track.id', limit=100, offset=0, market=None,
                                     additional_types=['track'])
@@ -41,7 +51,16 @@ def extract_song_ids(playlist):
 
 # Create a DataFrame with audio features from an array of song ids
 
-def get_song_features(array_of_ids):
+
+def get_song_features(playlist):
+
+    print(playlist)
+
+    playlist_id = get_playlist_id(playlist)
+
+    print(playlist_id)
+
+    array_of_ids = extract_song_ids(playlist)
 
     energy_array = [];
     key_array = [];
@@ -51,7 +70,7 @@ def get_song_features(array_of_ids):
     tempo_array = [];
     id_array = [];
 
-    af = sp.audio_features(extract_song_ids(playlist))
+    af = sp.audio_features(array_of_ids)
 
     for i in range(len(array_of_ids)):
 
@@ -82,11 +101,3 @@ def song_artist_display(id):
     name = sp.track(id).get('artist')
 
     return name;
-
-
-
-print(sp.track('1vjmuZ6Avr9H4tNoD74FXL'))
-
-print(song_name_display('1vjmuZ6Avr9H4tNoD74FXL'))
-
-print(song_artist_display('1vjmuZ6Avr9H4tNoD74FXL'))

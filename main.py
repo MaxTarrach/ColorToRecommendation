@@ -1,18 +1,12 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QGridLayout, QWidget, QLineEdit, QPushButton, QListWidget, QMessageBox
 from PyQt5.QtGui import QPixmap
-import cv2
-from sklearn.cluster import KMeans
-import numpy as np
 import RecommendationModel
 import GetSpotify
 import  utils
 import VisualFeatureExtraction
 import matplotlib.pyplot as plt
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtChart import QChart, QChartView, QHorizontalBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
-from PyQt5.Qt import Qt
-from PyQt5.QtGui import QPainter
 
 
 cluster_centers = 4
@@ -75,13 +69,16 @@ class MainWIndow(QWidget):
 
         self.listWidget = QListWidget()
 
-        for i in range(len(RecommendationModel.sort_after_distances(RecommendationModel.distances))):
+        sortedlist = RecommendationModel.getSortedList(image, 4, 'https://open.spotify.com/playlist/0cubuWEaRYj2CUCOSkfrIq?si=80189f4a5b2d4c51')
+
+        for i in range(len(sortedlist)):
             self.listWidget.insertItem(i, GetSpotify.song_name_display(
-                str(RecommendationModel.sort_after_distances(RecommendationModel.distances)[i][6])) + '    ' + str(RecommendationModel.sort_after_distances(RecommendationModel.distances)[i][7]))
+                str(sortedlist[i][6])) + '    ' + str(sortedlist[i][7]))
 
         # Add List and Image to grid
         self.grid.addWidget(self.listWidget, 6, 1, 1, 3)
         self.grid.addWidget(self.label, 3, 2, 1, 3)
+
 
         # Compute plot of color clustering
         bar = utils.plot_colors(VisualFeatureExtraction.create_hist(VisualFeatureExtraction.create_cluster(image,

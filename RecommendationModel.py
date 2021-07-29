@@ -4,17 +4,6 @@ from GetSpotify import *
 
 from VisualFeatureExtraction import *
 
-#import playlist dataframe with all audio features needed
-
-df_songs = get_song_features(extract_song_ids(playlist))
-
-df_visual = features_image(image_file, create_cluster(image_file, cluster_centers).cluster_centers_, create_hist(create_cluster(image_file, cluster_centers)))
-
-
-visual_np = numpy.array(df_visual)
-
-songs_np = df_songs.to_numpy()
-
 
 def normalize_songs(songVectors):
 
@@ -27,8 +16,7 @@ def normalize_songs(songVectors):
     return songVectors
 
 
-# calculate distance between visual features of image and every song
-
+# calculate distance between visual features of image and every song #######VERSION 1##########
 def calculate_distance(imageVector, songVectors):
 
     distance_measures = []
@@ -37,24 +25,14 @@ def calculate_distance(imageVector, songVectors):
 
         # brightness - key
         brightness_key = imageVector[4] - songVectors[i, 1]
-        print('index:', i, 'img:', imageVector[4], 'song:', songVectors[i,1])
         # brightness - tempo
         brightness_tempo = imageVector[4] - songVectors[i, 5]
-        print('index:', i, 'img:', imageVector[4], 'song:', songVectors[i, 5])
         # brightnes - loudness
         brightness_loudness = imageVector[4] - songVectors[i, 2]
-        print('index:', i, 'img:', imageVector[4], 'song:', songVectors[i, 2])
         # saturation - tempo
         saturation_tempo = imageVector[4] - songVectors[i, 5]
-        print('index:', i, 'img:', imageVector[4], 'song:', songVectors[i, 5])
         # blue - mode (minor)
         blue_key = imageVector[2] - songVectors[i, 1]
-        print('index:', i, 'img:', imageVector[2], 'song:', songVectors[i, 1])
-
-        # yellow - key (major)
-
-        #advanced calculation
-
 
         # primitive calculation
         distance = abs(brightness_key) + abs(brightness_tempo) + abs(brightness_loudness) + abs(saturation_tempo) + abs(blue_key)
@@ -64,7 +42,7 @@ def calculate_distance(imageVector, songVectors):
     return distance_measures;
 
 
-# work on this
+# work on this - extend this version
 
 def calculate_distances_2 (imageVector, songVectors):
 
@@ -76,13 +54,10 @@ def calculate_distances_2 (imageVector, songVectors):
         brightness_key = (imageVector[4] - songVectors[i, 1])**2
 
         brightness_tempo = (imageVector[4] - songVectors[i, 5])**2
-        print('index:', i, 'img:', imageVector[4], 'song:', songVectors[i, 5])
         # brightnes - loudness
         brightness_loudness = (imageVector[4] - songVectors[i, 2])**2
-        print('index:', i, 'img:', imageVector[4], 'song:', songVectors[i, 2])
         # saturation - tempo
         saturation_tempo = (imageVector[4] - songVectors[i, 5])**2
-        print('index:', i, 'img:', imageVector[4], 'song:', songVectors[i, 5])
         # blue - mode (minor)
         blue_key = (imageVector[2] - songVectors[i, 1])**2
 
@@ -94,16 +69,8 @@ def calculate_distances_2 (imageVector, songVectors):
 
     return distance_measures;
 
-# distances 2 with new distance measure
 
-
-#
-# COMMING SOON
-#
-
-distances = calculate_distances_2(visual_np, normalize_songs(songs_np))
-
-def sort_after_distances(distances):
+def sort_after_distances(songs, distances):
     a = numpy.array(distances)
 
     a_np = []
@@ -113,7 +80,7 @@ def sort_after_distances(distances):
 
     # add distances to arrays
 
-    added = numpy.append(normalize_songs(songs_np), a_np, 1)
+    added = numpy.append(normalize_songs(songs), a_np, 1)
 
     # sort array
 
@@ -123,9 +90,29 @@ def sort_after_distances(distances):
 
 
 # Nicer to look at rating than just the pure distance
-
-def calculate_rating():
+def calculate_rating(sortedList):
     ratings = []
 
     return ratings;
+
+
+# Function to call from main that creates the sorted list we want to display
+def getSortedList(image,clusterCenters, playlist):
+
+    # audio_df = GetSpotify.playlist(playlist)
+    df_songs = get_song_features(playlist)
+    # visual_df = VisualFeatureExtraction(image)
+    df_visual = features_image(image, create_cluster(image, clusterCenters).cluster_centers_,
+                               create_hist(create_cluster(image, clusterCenters)))
+
+    visual_np = numpy.array(df_visual)
+
+    songs_np = df_songs.to_numpy()
+
+    distances = calculate_distances_2(visual_np, normalize_songs(songs_np))
+
+    sortedlist = sort_after_distances(songs_np, distances)
+
+    return sortedlist;
+
 
