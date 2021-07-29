@@ -8,7 +8,7 @@ from VisualFeatureExtraction import *
 
 df_songs = get_song_features(extract_song_ids(playlist))
 
-df_visual = features_image(image_file, create_cluster(image_file,cluster_centers).cluster_centers_,create_hist(create_cluster(image_file,cluster_centers)))
+df_visual = features_image(image_file, create_cluster(image_file, cluster_centers).cluster_centers_, create_hist(create_cluster(image_file, cluster_centers)))
 
 
 visual_np = numpy.array(df_visual)
@@ -26,8 +26,6 @@ def normalize_songs(songVectors):
 
     return songVectors
 
-
-norm_songs = normalize_songs(songs_np)
 
 # calculate distance between visual features of image and every song
 
@@ -66,6 +64,8 @@ def calculate_distance(imageVector, songVectors):
     return distance_measures;
 
 
+# work on this
+
 def calculate_distances_2 (imageVector, songVectors):
 
     distance_measures = []
@@ -101,25 +101,25 @@ def calculate_distances_2 (imageVector, songVectors):
 # COMMING SOON
 #
 
+distances = calculate_distances_2(visual_np, normalize_songs(songs_np))
 
-distances = calculate_distances_2(visual_np, norm_songs)
+def sort_after_distances(distances):
+    a = numpy.array(distances)
 
-a = numpy.array(distances)
+    a_np = []
 
-a_np = []
+    for i in range(len(a)):
+        a_np.append([a[i]])
 
-for i in range(len(a)):
+    # add distances to arrays
 
-    a_np.append([a[i]])
+    added = numpy.append(normalize_songs(songs_np), a_np, 1)
 
+    # sort array
 
-# add distances to arrays
+    sorted_songs = added[added[:, 7].argsort()]
 
-added = numpy.append(norm_songs, a_np, 1)
-
-# sort array
-
-sorted_songs = added[added[:, 7].argsort()]
+    return sorted_songs;
 
 
 # Nicer to look at rating than just the pure distance

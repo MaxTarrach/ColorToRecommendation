@@ -17,7 +17,7 @@ from PyQt5.QtGui import QPainter
 
 cluster_centers = 4
 
-image_file = '/Users/maximiliantarrach/Documents/Bilder/blade_runner.jpeg'
+image_file = '/Users/maximiliantarrach/Documents/Bilder/blade_runner_2.jpeg'
 
 class MainWIndow(QWidget):
 
@@ -38,10 +38,9 @@ class MainWIndow(QWidget):
         self.lineSpotifyLink = QLineEdit(self)
         self.lineSpotifyLink.setPlaceholderText('Example: https://open.spotify.com/playlist/0cubuWEaRYj2CUCOSkfrIq?si=11af689f2d724676')
 
+        # GUI submit button
         self.buttonFileLoader = QPushButton('Compute')
-
         self.buttonFileLoader.clicked.connect(lambda: self.button_click(self.lineFileLoader.text(), self.lineSpotifyLink.text()))
-
 
         # Grid creation
         self.grid = QGridLayout()
@@ -68,26 +67,28 @@ class MainWIndow(QWidget):
 
     @pyqtSlot()
     def button_click(self, image, playlist):
+
         #  Image load and label creation
         self.im = QPixmap(image).scaledToWidth(720)
         self.label = QLabel()
         self.label.setPixmap(self.im)
-        # Align center
 
         self.listWidget = QListWidget()
 
-        for i in range(len(RecommendationModel.sorted_songs)):
+        for i in range(len(RecommendationModel.sort_after_distances(RecommendationModel.distances))):
             self.listWidget.insertItem(i, GetSpotify.song_name_display(
-                str(RecommendationModel.sorted_songs[i][6])) + '    ' + str(RecommendationModel.sorted_songs[i][7]))
+                str(RecommendationModel.sort_after_distances(RecommendationModel.distances)[i][6])) + '    ' + str(RecommendationModel.sort_after_distances(RecommendationModel.distances)[i][7]))
 
+        # Add List and Image to grid
         self.grid.addWidget(self.listWidget, 6, 1, 1, 3)
         self.grid.addWidget(self.label, 3, 2, 1, 3)
 
+        # Compute plot of color clustering
         bar = utils.plot_colors(VisualFeatureExtraction.create_hist(VisualFeatureExtraction.create_cluster(image,
                                                                                                            cluster_centers)),
                                 VisualFeatureExtraction.create_cluster(image, cluster_centers).cluster_centers_)
 
-        # show our color bart
+        # show color plot
         plt.figure()
         plt.axis("off")
         plt.imshow(bar)

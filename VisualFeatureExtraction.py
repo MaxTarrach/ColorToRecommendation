@@ -6,12 +6,6 @@ import  utils
 import numpy as np
 from main import *
 
-#Variablen
-
-
-image_file = "/Users/maximiliantarrach/Documents/Bilder/blade_runner.jpeg"
-
-
 
 def create_cluster(filepath, cluster_centers):
     img = cv2.imread(filepath)
@@ -35,7 +29,6 @@ def create_hist(clt):
     hist /= hist.sum()
     # return the histogram
     return hist
-
 
 
 def read_and_convert_to_rgb(filepath):
@@ -132,7 +125,7 @@ def features_image (filepath, clt, hist):
 
     # rgb value
 
-    rgb = weighted_rgb_score(clt,hist)
+    rgb = weighted_rgb_score(clt, hist)
 
     rgb = utils.transfrom_255_to_1(rgb)
 
@@ -159,5 +152,3 @@ def features_image (filepath, clt, hist):
 
 #y = VisualFeatureExtraction.convert_rgb_to_hsv(x)
 
-
-x = features_image(image_file, create_cluster(image_file,cluster_centers).cluster_centers_,create_hist(create_cluster(image_file,cluster_centers)))
