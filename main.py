@@ -32,6 +32,8 @@ class MainWIndow(QWidget):
         self.lineSpotifyLink = QLineEdit(self)
         self.lineSpotifyLink.setPlaceholderText('Example: https://open.spotify.com/playlist/0cubuWEaRYj2CUCOSkfrIq?si=11af689f2d724676')
 
+        # GUI Spotify User ID?
+
         # GUI submit button
         self.buttonFileLoader = QPushButton('Compute')
         self.buttonFileLoader.clicked.connect(lambda: self.button_click(self.lineFileLoader.text(), self.lineSpotifyLink.text()))
@@ -69,7 +71,7 @@ class MainWIndow(QWidget):
 
         self.listWidget = QListWidget()
 
-        sortedlist = RecommendationModel.getSortedList(image, 4, 'https://open.spotify.com/playlist/0cubuWEaRYj2CUCOSkfrIq?si=80189f4a5b2d4c51')
+        sortedlist = RecommendationModel.getSortedList(image, 4, playlist)
 
         for i in range(len(sortedlist)):
             self.listWidget.insertItem(i, GetSpotify.song_name_display(
@@ -79,11 +81,14 @@ class MainWIndow(QWidget):
         self.grid.addWidget(self.listWidget, 6, 1, 1, 3)
         self.grid.addWidget(self.label, 3, 2, 1, 3)
 
-
         # Compute plot of color clustering
         bar = utils.plot_colors(VisualFeatureExtraction.create_hist(VisualFeatureExtraction.create_cluster(image,
                                                                                                            cluster_centers)),
                                 VisualFeatureExtraction.create_cluster(image, cluster_centers).cluster_centers_)
+
+        # Plot colors inside the gui:
+
+        self.label_plot_1 = QLabel('Light green', self)
 
         # show color plot
         plt.figure()

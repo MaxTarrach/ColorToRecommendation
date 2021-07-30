@@ -73,13 +73,6 @@ def convert_rgb_to_grayscale(rgb_values):
     return grayscale_img;
 
 
-# Get yellow value - intensity of yellow = 1 - tristimulus value of blue
-
-def get_yellow_value_of_rgb():
-
-    yellow_value = 1;
-
-    return yellow_value;
 
 def get_brightness_value_of_rgb(filepath):
 
@@ -118,7 +111,35 @@ def weighted_rgb_score(rgb_values, weights):
 
 '''collect all features needed'''
 
-# Weighted rgb values
+
+# Get yellow value - intensity of yellow = rgb to cmyk and get brightness of only the y channel of the cmyk image
+
+def get_yellow_value_of_rgb(filepath):
+
+    img = plt.imread(filepath)
+
+    bgr = img.astype(float) / 255.
+
+    with np.errstate(invalid='ignore', divide='ignore'):
+        K = 1 - np.max(bgr, axis=2)
+        C = (1 - bgr[..., 2] - K) / (1 - K)
+        M = (1 - bgr[..., 1] - K) / (1 - K)
+        Y = (1 - bgr[..., 0] - K) / (1 - K)
+
+    # Convert the input BGR image to CMYK colorspace
+    CMYK = (np.dstack((C, M, Y, K)) * 255).astype(np.uint8)
+
+    # Split CMYK channels
+    Y, M, C, K = cv2.split(CMYK)
+
+    np.isfinite(C).all()
+    np.isfinite(M).all()
+    np.isfinite(K).all()
+    np.isfinite(Y).all()
+
+    yellow = np.average(Y)
+
+    return yellow;
 
 
 def features_image (filepath, clt, hist):
@@ -137,7 +158,13 @@ def features_image (filepath, clt, hist):
 
     brightness = get_brightness_value_of_rgb(filepath)
 
-    image_vector = [rgb[0], rgb[1], rgb[2], saturation, brightness]
+    # yellow
+
+    yellow = get_yellow_value_of_rgb(filepath)
+
+    yellow = utils.transform_yellow_255_to_1(yellow)
+
+    image_vector = [rgb[0], rgb[1], rgb[2], saturation, brightness, yellow]
 
     return image_vector;
 

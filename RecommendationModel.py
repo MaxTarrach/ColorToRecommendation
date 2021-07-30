@@ -60,8 +60,10 @@ def calculate_distances_2 (imageVector, songVectors):
         saturation_tempo = (imageVector[4] - songVectors[i, 5])**2
         # blue - mode (minor)
         blue_key = (imageVector[2] - songVectors[i, 1])**2
+        #yellow - energy
+        yellow_energy = (imageVector[5] - songVectors[i, 0])**2
 
-        distance = math.sqrt(brightness_key + brightness_tempo + brightness_loudness + saturation_tempo + blue_key)
+        distance = math.sqrt(brightness_key + brightness_tempo + brightness_loudness + saturation_tempo + blue_key+ yellow_energy)
 
         distance = 1 / (1 + distance)
 

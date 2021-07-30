@@ -31,6 +31,12 @@ def transfrom_255_to_1(value):
 
     return value_0_to_1
 
+def transform_yellow_255_to_1(value):
+
+    y = value / 255
+
+    return y
+
 
 def handle_spotify_link(link):
     link= ''
