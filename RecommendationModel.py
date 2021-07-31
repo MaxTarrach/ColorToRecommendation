@@ -16,33 +16,69 @@ def normalize_songs(songVectors):
     return songVectors
 
 
-# calculate distance between visual features of image and every song #######VERSION 1##########
-def calculate_distance(imageVector, songVectors):
+def calculate_brightness_key(imageVector, songVectors, i):
 
-    distance_measures = []
+    brightness_key = (imageVector[4] - songVectors[i, 1])**2
 
-    for i in range(len(songVectors)):
-
-        # brightness - key
-        brightness_key = imageVector[4] - songVectors[i, 1]
-        # brightness - tempo
-        brightness_tempo = imageVector[4] - songVectors[i, 5]
-        # brightnes - loudness
-        brightness_loudness = imageVector[4] - songVectors[i, 2]
-        # saturation - tempo
-        saturation_tempo = imageVector[4] - songVectors[i, 5]
-        # blue - mode (minor)
-        blue_key = imageVector[2] - songVectors[i, 1]
-
-        # primitive calculation
-        distance = abs(brightness_key) + abs(brightness_tempo) + abs(brightness_loudness) + abs(saturation_tempo) + abs(blue_key)
-
-        distance_measures.append(distance)
-
-    return distance_measures;
+    return brightness_key;
 
 
-# work on this - extend this version
+def calculate_brightness_tempo(imageVector, songVectors, i):
+
+    brightness_tempo = (imageVector[4] - songVectors[i, 5]) ** 2
+
+    return brightness_tempo
+
+
+def calculate_brightness_loudness(imageVector, songVectors, i):
+
+    brightness_loudness = (imageVector[4] - songVectors[i, 2]) ** 2
+
+    return brightness_loudness
+
+
+def calculate_saturation_tempo(imageVector, songVectors, i):
+
+    saturation_tempo = (imageVector[3] - songVectors[i, 5]) ** 2
+
+    return saturation_tempo;
+
+
+def calculate_blue_key(imageVector, songVectors, i):
+
+    blue_key = (imageVector[2] - songVectors[i, 1]) ** 2
+
+    return blue_key
+
+
+def calculate_yellow_energy(imageVector, songVectors, i):
+
+    yellow_energy = (imageVector[5] - songVectors[i, 0]) ** 2
+
+    return yellow_energy
+
+
+def calculate_color_mode(imageVector, songVectors, i):
+
+    mode = songVectors[i, 3]
+
+    if mode == 0:
+        color_mode = mode - imageVector[2]
+
+    else:
+        color_mode = mode - imageVector[5]
+
+    return color_mode;
+
+
+def calculate_saturation_mode(imageVector, songVectors, i):
+
+    mode = songVectors[i, 3]
+
+    saturation_mode = mode - imageVector[3]
+
+    return saturation_mode;
+
 
 def calculate_distances_2 (imageVector, songVectors):
 
@@ -50,20 +86,23 @@ def calculate_distances_2 (imageVector, songVectors):
 
     for i in range(len(songVectors)):
 
-        # euklidische Distanz für bild # jeden einzelnen song
-        brightness_key = (imageVector[4] - songVectors[i, 1])**2
+        brightness_key = abs(calculate_brightness_key(imageVector, songVectors, i))
 
-        brightness_tempo = (imageVector[4] - songVectors[i, 5])**2
-        # brightnes - loudness
-        brightness_loudness = (imageVector[4] - songVectors[i, 2])**2
-        # saturation - tempo
-        saturation_tempo = (imageVector[4] - songVectors[i, 5])**2
-        # blue - mode (minor)
-        blue_key = (imageVector[2] - songVectors[i, 1])**2
-        #yellow - energy
-        yellow_energy = (imageVector[5] - songVectors[i, 0])**2
+        brightness_tempo = abs(calculate_brightness_tempo(imageVector, songVectors, i))
 
-        distance = math.sqrt(brightness_key + brightness_tempo + brightness_loudness + saturation_tempo + blue_key+ yellow_energy)
+        brightness_loudness = abs(calculate_brightness_loudness(imageVector, songVectors, i))
+
+        saturation_tempo = abs(calculate_saturation_tempo(imageVector, songVectors, i))
+
+        blue_key = abs(calculate_blue_key(imageVector, songVectors, i))
+
+        yellow_energy = abs(calculate_yellow_energy(imageVector, songVectors, i))
+
+        color_mode = abs(calculate_color_mode(imageVector, songVectors, i))
+
+        saturation_mode = abs(calculate_saturation_mode(imageVector, songVectors, i))
+
+        distance = math.sqrt(brightness_key + brightness_tempo + brightness_loudness + saturation_tempo + blue_key + yellow_energy + color_mode + saturation_mode)
 
         distance = 1 / (1 + distance)
 

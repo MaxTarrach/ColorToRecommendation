@@ -19,6 +19,7 @@ def create_cluster(filepath, cluster_centers):
 
     return clt;
 
+
 def create_hist(clt):
     # grab the number of different clusters and create a histogram
     # based on the number of pixels assigned to each cluster
@@ -73,9 +74,7 @@ def convert_rgb_to_grayscale(rgb_values):
     return grayscale_img;
 
 
-
 def get_brightness_value_of_rgb(filepath):
-
 
     img = cv2.imread(filepath)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -87,7 +86,6 @@ def get_brightness_value_of_rgb(filepath):
     brightness = np.sum(img) / (255* cols * rows)
 
     return brightness;
-
 
 
 def weighted_rgb_score(rgb_values, weights):
@@ -108,8 +106,6 @@ def weighted_rgb_score(rgb_values, weights):
     # (b0 * w0) + (b1 * w1) + (b2 * w2) + (b3 * w3) = bweighted
 
     return all_centers_rgb;
-
-'''collect all features needed'''
 
 
 # Get yellow value - intensity of yellow = rgb to cmyk and get brightness of only the y channel of the cmyk image
@@ -167,15 +163,3 @@ def features_image (filepath, clt, hist):
     image_vector = [rgb[0], rgb[1], rgb[2], saturation, brightness, yellow]
 
     return image_vector;
-
-
-# build a histogram of clusters and then create a figure
-# representing the number of pixels labeled to each color
-#hist = VisualFeatureExtraction.create_hist(clt)
-
-#x = VisualFeatureExtraction.weighted_rgb_score(clt.cluster_centers_, hist)
-
-#x = utils.transfrom_255_to_1(x)
-
-#y = VisualFeatureExtraction.convert_rgb_to_hsv(x)
-

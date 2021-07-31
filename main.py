@@ -11,7 +11,6 @@ from PyQt5.QtCore import pyqtSlot
 
 cluster_centers = 4
 
-image_file = '/Users/maximiliantarrach/Documents/Bilder/blade_runner_2.jpeg'
 
 class MainWIndow(QWidget):
 
@@ -89,6 +88,10 @@ class MainWIndow(QWidget):
         # Plot colors inside the gui:
 
         self.label_plot_1 = QLabel('Light green', self)
+
+        self.label_plot_1.setStyleSheet('background-color: lightgreen; border: 1px solid black;')
+
+        self.grid.addWidget(self.label_plot_1, 4, 1, 1, 3)
 
         # show color plot
         plt.figure()
