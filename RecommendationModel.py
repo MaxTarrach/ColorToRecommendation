@@ -5,15 +5,15 @@ from GetSpotify import *
 from VisualFeatureExtraction import *
 
 
-def normalize_songs(songVectors):
+def normalize_songs(song_vectors):
 
-    for i in range(len(songVectors)):
+    for i in range(len(song_vectors)):
 
-        songVectors[i, 1] = songVectors[i, 1] / 11
-        songVectors[i, 2] = songVectors[i, 2] / 60+1
-        songVectors[i, 5] = songVectors[i, 5] / 200
+        song_vectors[i, 1] = song_vectors[i, 1] / 11
+        song_vectors[i, 2] = song_vectors[i, 2] / 60
+        song_vectors[i, 5] = song_vectors[i, 5] / 200
 
-    return songVectors
+    return song_vectors
 
 
 def calculate_brightness_key(imageVector, songVectors, i):
@@ -138,7 +138,7 @@ def calculate_rating(sortedList):
 
 
 # Function to call from main that creates the sorted list we want to display
-def getSortedList(image,clusterCenters, playlist):
+def getSortedList(image, clusterCenters, playlist):
 
     # audio_df = GetSpotify.playlist(playlist)
     df_songs = get_song_features(playlist)

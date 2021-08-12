@@ -77,6 +77,7 @@ def get_song_features(playlist):
         energy_array.append(af[i].get('energy'))
         key_array.append(af[i].get('key'))
         loudness_array.append(af[i].get('loudness'))
+        print(af[i].get('loudness'))
         mode_array.append(af[i].get('mode'))
         valence_array.append(af[i].get('valence'))
         tempo_array.append(af[i].get('tempo'))

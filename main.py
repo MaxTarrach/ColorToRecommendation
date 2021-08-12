@@ -1,15 +1,29 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QGridLayout, QWidget, QLineEdit, QPushButton, QListWidget, QMessageBox
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QColor
 import RecommendationModel
 import GetSpotify
 import  utils
 import VisualFeatureExtraction
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Qt5Agg')
+
 from PyQt5.QtCore import pyqtSlot
+
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+from matplotlib.figure import Figure
 
 
 cluster_centers = 4
+
+
+class MplCanvas(FigureCanvasQTAgg):
+
+    def __init__(self, parent=None, width=5, height=4, dpi=100):
+        fig = Figure(figsize=(width, height), dpi =dpi)
+        self.axes = fig.add_subplot(111)
+        super(MplCanvas, self).__init__(fig)
 
 
 class MainWIndow(QWidget):
@@ -36,6 +50,7 @@ class MainWIndow(QWidget):
         # GUI submit button
         self.buttonFileLoader = QPushButton('Compute')
         self.buttonFileLoader.clicked.connect(lambda: self.button_click(self.lineFileLoader.text(), self.lineSpotifyLink.text()))
+
 
         # Grid creation
         self.grid = QGridLayout()
@@ -72,32 +87,50 @@ class MainWIndow(QWidget):
 
         sortedlist = RecommendationModel.getSortedList(image, 4, playlist)
 
+        print(sortedlist)
+
         for i in range(len(sortedlist)):
             self.listWidget.insertItem(i, GetSpotify.song_name_display(
                 str(sortedlist[i][6])) + '    ' + str(sortedlist[i][7]))
+
+        self.listWidget.itemClicked.connect(lambda: self.item_click(self.listWidget.currentRow(), sortedlist))
 
         # Add List and Image to grid
         self.grid.addWidget(self.listWidget, 6, 1, 1, 3)
         self.grid.addWidget(self.label, 3, 2, 1, 3)
 
-        # Compute plot of color clustering
-        bar = utils.plot_colors(VisualFeatureExtraction.create_hist(VisualFeatureExtraction.create_cluster(image,
-                                                                                                           cluster_centers)),
-                                VisualFeatureExtraction.create_cluster(image, cluster_centers).cluster_centers_)
+        weights = VisualFeatureExtraction.create_hist(VisualFeatureExtraction.create_cluster(image,cluster_centers))
+        colors = VisualFeatureExtraction.create_cluster(image, cluster_centers).cluster_centers_
 
         # Plot colors inside the gui:
+        self.label_plot_1 = QLabel(str(round(weights[0], 2)), self)
+        self.label_plot_2 = QLabel(str(round(weights[1], 2)), self)
+        self.label_plot_3 = QLabel(str(round(weights[2], 2)), self)
+        self.label_plot_4 = QLabel(str(round(weights[3], 2)), self)
 
-        self.label_plot_1 = QLabel('Light green', self)
+        # 4 rgb values of color clustering
+        colorValue1 = (colors[0][0], colors[0][1], colors[0][2])
+        colorValue2 = (colors[1][0], colors[1][1], colors[1][2])
+        colorValue3 = (colors[2][0], colors[2][1], colors[2][2])
+        colorValue4 = (colors[3][0], colors[3][1], colors[3][2])
 
-        self.label_plot_1.setStyleSheet('background-color: lightgreen; border: 1px solid black;')
+        self.label_plot_1.setStyleSheet('background-color:rgb' + str(colorValue1) + '; border: 1px solid black;')
+        self.label_plot_2.setStyleSheet('background-color:rgb' + str(colorValue2) + '; border: 1px solid black;')
+        self.label_plot_3.setStyleSheet('background-color:rgb' + str(colorValue3) + '; border: 1px solid black;')
+        self.label_plot_4.setStyleSheet('background-color:rgb' + str(colorValue4) + '; border: 1px solid black;')
 
-        self.grid.addWidget(self.label_plot_1, 4, 1, 1, 3)
+        self.grid.addWidget(self.label_plot_1, 4, 1)
+        self.grid.addWidget(self.label_plot_2, 4, 2)
+        self.grid.addWidget(self.label_plot_3, 4, 3)
+        self.grid.addWidget(self.label_plot_4, 4, 4)
 
-        # show color plot
-        plt.figure()
-        plt.axis("off")
-        plt.imshow(bar)
-        plt.show()
+    def item_click(self, item_position, sortedList):
+
+        self.sc = MplCanvas(self, width=4, height=4, dpi=50)
+        self.sc.axes.plot(['Energy', 'Key', 'Loudness', 'Mode', 'Valence', 'Tempo'], [sortedList[item_position][0], sortedList[item_position][1],
+                                                                        sortedList[item_position][2], sortedList[item_position][3], sortedList[item_position][4] ,sortedList[item_position][5]])
+
+        self.grid.addWidget(self.sc, 6, 4)
 
 
 if __name__ == '__main__':
