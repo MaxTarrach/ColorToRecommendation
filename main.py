@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QGridLayout, QWidget, QLineEdit, QPushButton, QListWidget, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow,QHBoxLayout, QSlider, QLabel, QGridLayout, QWidget, QLineEdit, QPushButton, QListWidget, QMessageBox
 from PyQt5.QtGui import QPixmap, QColor
 import RecommendationModel
 import GetSpotify
@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('Qt5Agg')
 
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, Qt
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
@@ -23,6 +23,7 @@ class MplCanvas(FigureCanvasQTAgg):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         fig = Figure(figsize=(width, height), dpi =dpi)
         self.axes = fig.add_subplot(111)
+        self.axes.set_ylim([0, 1])
         super(MplCanvas, self).__init__(fig)
 
 
@@ -51,21 +52,65 @@ class MainWIndow(QWidget):
         self.buttonFileLoader = QPushButton('Compute')
         self.buttonFileLoader.clicked.connect(lambda: self.button_click(self.lineFileLoader.text(), self.lineSpotifyLink.text()))
 
+        # sliders to canvase
+
+        self.textSlider1 = QLabel('Laune')
+        self.slider1 = QSlider(Qt.Horizontal, self)
+        self.slider1.setRange(0, 100)
+        self.slider1.setPageStep(5)
+
+        self.textSlider2 = QLabel('Ruhe')
+        self.slider2 = QSlider(Qt.Horizontal, self)
+        self.slider2.setRange(0, 100)
+        self.slider2.setPageStep(5)
+
+        self.textSlider3 = QLabel('Spannung')
+        self.slider3 = QSlider(Qt.Horizontal, self)
+        self.slider3.setRange(0, 100)
+        self.slider3.setPageStep(5)
+
+        self.buttonSlider = QPushButton('Recalculate')
+
+        self.sc = MplCanvas(self, width=4, height=4, dpi=50)
+
+        self.listWidget = QListWidget()
+
+        placeholder = 'Assets/placeholder.jpg'
+
+        #  Image load and label creation
+        self.im = QPixmap(placeholder).scaledToWidth(720)
+        self.label = QLabel()
+        self.label.setPixmap(self.im)
 
         # Grid creation
         self.grid = QGridLayout()
 
         # Add elements to grid
-        self.grid.addWidget(self.textFileLoader, 1, 1)
-        self.grid.addWidget(self.lineFileLoader, 1, 2)
+        self.grid.addWidget(self.textFileLoader, 0, 0, 1, 1)
+        self.grid.addWidget(self.lineFileLoader, 0, 1, 1, 4)
 
-        self.grid.addWidget(self.textSpotifyLoader, 2, 1)
-        self.grid.addWidget(self.lineSpotifyLink, 2, 2)
+        self.grid.addWidget(self.textSpotifyLoader, 1, 0, 1, 1)
+        self.grid.addWidget(self.lineSpotifyLink, 1, 1, 1, 4)
 
-        self.grid.addWidget(self.buttonFileLoader, 1, 3, 2, 1)
-        self.grid.addWidget(self.text1, 5, 1)
-        self.grid.addWidget(self.text2, 5, 2)
-        self.grid.addWidget(self.text3, 5, 3)
+        self.grid.addWidget(self.buttonFileLoader, 0, 5, 2, 1)
+
+        self.grid.addWidget(self.label, 2, 0, 7, 4)
+
+        # Add slider to grid
+        self.grid.addWidget(self.textSlider1, 2, 4, 2, 1)
+        self.grid.addWidget(self.slider1, 3, 4, 2, 1)
+
+        self.grid.addWidget(self.textSlider2, 4, 4, 2, 1)
+        self.grid.addWidget(self.slider2, 5, 4, 2, 1)
+
+        self.grid.addWidget(self.textSlider3, 6, 4, 2, 1)
+        self.grid.addWidget(self.slider3, 7, 4, 2, 1)
+
+        self.grid.addWidget(self.buttonSlider, 8, 4, 2, 1)
+
+        self.grid.addWidget(self.listWidget, 10, 0, 2, 4)
+
+        self.grid.addWidget(self.sc, 10, 4, 2, 2)
 
         self.setLayout(self.grid)
 
@@ -85,7 +130,7 @@ class MainWIndow(QWidget):
 
         self.listWidget = QListWidget()
 
-        sortedlist = RecommendationModel.getSortedList(image, 4, playlist)
+        sortedlist = RecommendationModel.getSortedList(image, cluster_centers, playlist)
 
         print(sortedlist)
 
@@ -96,17 +141,17 @@ class MainWIndow(QWidget):
         self.listWidget.itemClicked.connect(lambda: self.item_click(self.listWidget.currentRow(), sortedlist))
 
         # Add List and Image to grid
-        self.grid.addWidget(self.listWidget, 6, 1, 1, 3)
-        self.grid.addWidget(self.label, 3, 2, 1, 3)
+        self.grid.addWidget(self.listWidget, 10, 0, 2, 4)
+        self.grid.addWidget(self.label, 2, 0, 7, 4)
 
         weights = VisualFeatureExtraction.create_hist(VisualFeatureExtraction.create_cluster(image,cluster_centers))
         colors = VisualFeatureExtraction.create_cluster(image, cluster_centers).cluster_centers_
 
         # Plot colors inside the gui:
-        self.label_plot_1 = QLabel(str(round(weights[0], 2)), self)
-        self.label_plot_2 = QLabel(str(round(weights[1], 2)), self)
-        self.label_plot_3 = QLabel(str(round(weights[2], 2)), self)
-        self.label_plot_4 = QLabel(str(round(weights[3], 2)), self)
+        self.label_plot_1 = QLabel(str(round(weights[0], 3)*100) + '%', self)
+        self.label_plot_2 = QLabel(str(round(weights[1], 3)*100) + '%', self)
+        self.label_plot_3 = QLabel(str(round(weights[2], 3)*100) + '%', self)
+        self.label_plot_4 = QLabel(str(round(weights[3], 3)*100) + '%', self)
 
         # 4 rgb values of color clustering
         colorValue1 = (colors[0][0], colors[0][1], colors[0][2])
@@ -114,15 +159,15 @@ class MainWIndow(QWidget):
         colorValue3 = (colors[2][0], colors[2][1], colors[2][2])
         colorValue4 = (colors[3][0], colors[3][1], colors[3][2])
 
-        self.label_plot_1.setStyleSheet('background-color:rgb' + str(colorValue1) + '; border: 1px solid black;')
-        self.label_plot_2.setStyleSheet('background-color:rgb' + str(colorValue2) + '; border: 1px solid black;')
-        self.label_plot_3.setStyleSheet('background-color:rgb' + str(colorValue3) + '; border: 1px solid black;')
-        self.label_plot_4.setStyleSheet('background-color:rgb' + str(colorValue4) + '; border: 1px solid black;')
+        self.label_plot_1.setStyleSheet('background-color:rgb' + str(colorValue1) + '; border: 1px solid black; color: rgb(78, 253, 84)')
+        self.label_plot_2.setStyleSheet('background-color:rgb' + str(colorValue2) + '; border: 1px solid black; color: rgb(78, 253, 84)')
+        self.label_plot_3.setStyleSheet('background-color:rgb' + str(colorValue3) + '; border: 1px solid black; color: rgb(78, 253, 84)')
+        self.label_plot_4.setStyleSheet('background-color:rgb' + str(colorValue4) + '; border: 1px solid black; color: rgb(78, 253, 84)')
 
-        self.grid.addWidget(self.label_plot_1, 4, 1)
-        self.grid.addWidget(self.label_plot_2, 4, 2)
-        self.grid.addWidget(self.label_plot_3, 4, 3)
-        self.grid.addWidget(self.label_plot_4, 4, 4)
+        self.grid.addWidget(self.label_plot_1, 9, 0, 1, 1)
+        self.grid.addWidget(self.label_plot_2, 9, 1, 1, 1)
+        self.grid.addWidget(self.label_plot_3, 9, 2, 1, 1)
+        self.grid.addWidget(self.label_plot_4, 9, 3, 1, 1)
 
     def item_click(self, item_position, sortedList):
 
@@ -130,7 +175,10 @@ class MainWIndow(QWidget):
         self.sc.axes.plot(['Energy', 'Key', 'Loudness', 'Mode', 'Valence', 'Tempo'], [sortedList[item_position][0], sortedList[item_position][1],
                                                                         sortedList[item_position][2], sortedList[item_position][3], sortedList[item_position][4] ,sortedList[item_position][5]])
 
-        self.grid.addWidget(self.sc, 6, 4)
+        self.chroma_key = QLabel('Key: ' + GetSpotify.get_song_key(sortedList[item_position][1]))
+
+        self.grid.addWidget(self.sc, 10, 4, 2, 2)
+        self.grid.addWidget(self.chroma_key, 11, 4, 1, 1)
 
 
 if __name__ == '__main__':

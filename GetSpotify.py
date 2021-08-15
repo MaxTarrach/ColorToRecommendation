@@ -54,11 +54,7 @@ def extract_song_ids(playlist_string):
 
 def get_song_features(playlist):
 
-    print(playlist)
-
     playlist_id = get_playlist_id(playlist)
-
-    print(playlist_id)
 
     array_of_ids = extract_song_ids(playlist)
 
@@ -102,3 +98,10 @@ def song_artist_display(id):
     name = sp.track(id).get('artist')
 
     return name;
+
+
+def get_song_key(song):
+
+    key = 1
+
+    return key;
