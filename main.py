@@ -110,7 +110,7 @@ class MainWIndow(QWidget):
 
         self.grid.addWidget(self.listWidget, 10, 0, 2, 4)
 
-        self.grid.addWidget(self.sc, 10, 4, 2, 2)
+        self.grid.addWidget(self.sc, 10, 4, 1, 2)
 
         self.setLayout(self.grid)
 
@@ -136,7 +136,7 @@ class MainWIndow(QWidget):
 
         for i in range(len(sortedlist)):
             self.listWidget.insertItem(i, GetSpotify.song_name_display(
-                str(sortedlist[i][6])) + '    ' + str(sortedlist[i][7]))
+                str(sortedlist[i][7])) + '    ' + str(sortedlist[i][8]))
 
         self.listWidget.itemClicked.connect(lambda: self.item_click(self.listWidget.currentRow(), sortedlist))
 
@@ -172,13 +172,15 @@ class MainWIndow(QWidget):
     def item_click(self, item_position, sortedList):
 
         self.sc = MplCanvas(self, width=4, height=4, dpi=50)
-        self.sc.axes.plot(['Energy', 'Key', 'Loudness', 'Mode', 'Valence', 'Tempo'], [sortedList[item_position][0], sortedList[item_position][1],
-                                                                        sortedList[item_position][2], sortedList[item_position][3], sortedList[item_position][4] ,sortedList[item_position][5]])
+        self.sc.axes.plot(['Energy', 'Loudness', 'Valence', 'Tempo'], [sortedList[item_position][0],
+                                                                        sortedList[item_position][2],  sortedList[item_position][4] ,sortedList[item_position][5]])
 
-        self.chroma_key = QLabel('Key: ' + GetSpotify.get_song_key(sortedList[item_position][1]))
+        self.chroma_key = QLabel('Key: ' + GetSpotify.get_song_key(sortedList[item_position][6]))
+        self.mode = QLabel('Mode: ' + GetSpotify.get_song_mode(sortedList[item_position][3]))
 
-        self.grid.addWidget(self.sc, 10, 4, 2, 2)
+        self.grid.addWidget(self.sc, 10, 4, 1, 2)
         self.grid.addWidget(self.chroma_key, 11, 4, 1, 1)
+        self.grid.addWidget(self.mode, 11, 5, 1, 1)
 
 
 if __name__ == '__main__':

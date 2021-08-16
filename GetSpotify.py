@@ -64,6 +64,7 @@ def get_song_features(playlist):
     mode_array = [];
     valence_array = [];
     tempo_array = [];
+    key_full_number_array = [];
     id_array = [];
 
     af = sp.audio_features(array_of_ids)
@@ -73,14 +74,15 @@ def get_song_features(playlist):
         energy_array.append(af[i].get('energy'))
         key_array.append(af[i].get('key'))
         loudness_array.append(af[i].get('loudness'))
-        print(af[i].get('loudness'))
         mode_array.append(af[i].get('mode'))
         valence_array.append(af[i].get('valence'))
         tempo_array.append(af[i].get('tempo'))
+        key_full_number_array.append(af[i].get('key'))
+        print(af[i].get('mode'))
         id_array.append(array_of_ids[i])
 
         d = {'energy': energy_array, 'key': key_array, 'loudness': loudness_array, 'mode': mode_array,
-         'valence': valence_array, 'tempo': tempo_array, 'id': id_array}
+         'valence': valence_array, 'tempo': tempo_array,'key_full_number': key_full_number_array, 'id': id_array}
 
     df = np.DataFrame(data=d)
     return df
@@ -100,8 +102,46 @@ def song_artist_display(id):
     return name;
 
 
-def get_song_key(song):
+def get_song_key(song_chroma_key):
 
-    key = 1
+    song_chroma_key = str(song_chroma_key)
+
+    key_dictionary = {
+        "0": "C",
+        "1": "C#",
+        "2": "D",
+        "3": "D#",
+        "4": "E",
+        "5": "F",
+        "6": "F#",
+        "7": "G",
+        "8": "G#",
+        "9": "A",
+        "10": "A#",
+        "11": "B",
+    }
+
+    key = key_dictionary[song_chroma_key]
+
+    key = str(key)
 
     return key;
+
+
+def get_song_mode(song_mode):
+
+    song_mode = str(song_mode)
+
+    mode_dictionary = {
+        '0': 'Major',
+        '1': 'Minor'
+    }
+
+    mode = mode_dictionary[song_mode]
+
+    mode = str(mode)
+
+    return mode
+
+
+

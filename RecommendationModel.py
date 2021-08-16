@@ -10,8 +10,10 @@ def normalize_songs(song_vectors):
     for i in range(len(song_vectors)):
 
         song_vectors[i, 1] = song_vectors[i, 1] / 11
-        song_vectors[i, 2] = song_vectors[i, 2] / 60
-        song_vectors[i, 5] = song_vectors[i, 5] / 200
+        print(song_vectors[i, 2])
+        song_vectors[i, 2] = song_vectors[i, 2] / -60
+        print(song_vectors[i, 2])
+        song_vectors[i, 5] = song_vectors[i, 5] / 160
 
     return song_vectors
 
@@ -121,11 +123,11 @@ def sort_after_distances(songs, distances):
 
     # add distances to arrays
 
-    added = numpy.append(normalize_songs(songs), a_np, 1)
+    added = numpy.append(songs, a_np, 1)
 
     # sort array
 
-    sorted_songs = added[added[:, 7].argsort()]
+    sorted_songs = added[added[:, 8].argsort()]
 
     return sorted_songs;
 
