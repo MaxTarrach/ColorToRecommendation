@@ -54,20 +54,26 @@ class MainWIndow(QWidget):
 
         # sliders to canvase
 
-        self.textSlider1 = QLabel('Laune')
+        self.textSlider1 = QLabel('Laune ' + '(0)')
         self.slider1 = QSlider(Qt.Horizontal, self)
         self.slider1.setRange(0, 100)
         self.slider1.setPageStep(5)
+        self.slider1.setFocusPolicy(Qt.NoFocus)
+        self.slider1.valueChanged.connect(self.updateLabel1)
 
-        self.textSlider2 = QLabel('Ruhe')
+        self.textSlider2 = QLabel('Ruhe' + '(0)')
         self.slider2 = QSlider(Qt.Horizontal, self)
         self.slider2.setRange(0, 100)
         self.slider2.setPageStep(5)
+        self.slider2.setFocusPolicy(Qt.NoFocus)
+        self.slider2.valueChanged.connect(self.updateLabel2)
 
-        self.textSlider3 = QLabel('Spannung')
+        self.textSlider3 = QLabel('Spannung' + '(0)')
         self.slider3 = QSlider(Qt.Horizontal, self)
         self.slider3.setRange(0, 100)
         self.slider3.setPageStep(5)
+        self.slider3.setFocusPolicy(Qt.NoFocus)
+        self.slider3.valueChanged.connect(self.updateLabel3)
 
         self.buttonSlider = QPushButton('Recalculate')
 
@@ -123,14 +129,16 @@ class MainWIndow(QWidget):
     @pyqtSlot()
     def button_click(self, image, playlist):
 
+        sortedlist = RecommendationModel.getSortedList(image, cluster_centers, playlist)
+        weights = VisualFeatureExtraction.create_hist(VisualFeatureExtraction.create_cluster(image, cluster_centers))
+        colors = VisualFeatureExtraction.create_cluster(image, cluster_centers).cluster_centers_
+
         #  Image load and label creation
         self.im = QPixmap(image).scaledToWidth(720)
         self.label = QLabel()
         self.label.setPixmap(self.im)
 
         self.listWidget = QListWidget()
-
-        sortedlist = RecommendationModel.getSortedList(image, cluster_centers, playlist)
 
         print(sortedlist)
 
@@ -140,27 +148,16 @@ class MainWIndow(QWidget):
 
         self.tableWidget.setRowCount(len(sortedlist))
         self.tableWidget.setColumnCount(2)
-        self.tableWidget.setShowGrid(False)
         self.tableWidget.setHorizontalHeaderLabels(('TITEL', 'MATCH'))
 
         for i in range(len(sortedlist)):
             self.tableWidget.setItem(i, 0, QTableWidgetItem(GetSpotify.song_name_display(str(sortedlist[i][7]))))
             self.tableWidget.setItem(i, 1, QTableWidgetItem(str(sortedlist[i][8])))
 
-
-        #for i in range(len(sortedlist)):
-            #self.listWidget.insertItem(i, GetSpotify.song_name_display(
-                #str(sortedlist[i][7])) + '    ' + str(sortedlist[i][8]))
-
-        #self.listWidget.itemClicked.connect(lambda: self.item_click(self.listWidget.currentRow(), sortedlist))
         self.tableWidget.itemClicked.connect(lambda: self.item_click(self.tableWidget.currentRow(), sortedlist))
-        # Add List and Image to grid
-        #self.grid.addWidget(self.listWidget, 10, 0, 2, 4)
+
         self.grid.addWidget(self.tableWidget, 10, 0, 2, 4)
         self.grid.addWidget(self.label, 2, 0, 7, 4)
-
-        weights = VisualFeatureExtraction.create_hist(VisualFeatureExtraction.create_cluster(image,cluster_centers))
-        colors = VisualFeatureExtraction.create_cluster(image, cluster_centers).cluster_centers_
 
         # Plot colors inside the gui:
         self.label_plot_1 = QLabel(str(round(weights[0], 3)*100) + '%', self)
@@ -196,6 +193,18 @@ class MainWIndow(QWidget):
         self.grid.addWidget(self.sc, 10, 4, 1, 2)
         self.grid.addWidget(self.chroma_key, 11, 4, 1, 1)
         self.grid.addWidget(self.mode, 11, 5, 1, 1)
+
+    def updateLabel1(self, value):
+
+        self.textSlider1.setText('Laune ' + '(' + str(value) + ')')
+
+    def updateLabel2(self, value):
+
+        self.textSlider2.setText('Laune ' + '(' + str(value) + ')')
+
+    def updateLabel3(self, value):
+            self.textSlider3.setText('Laune ' + '(' + str(value) + ')')
+
 
 
 if __name__ == '__main__':
