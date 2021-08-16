@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow,QHBoxLayout, QSlider, QLabel, QGridLayout, QWidget, QLineEdit, QPushButton, QListWidget, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow,QHBoxLayout, QTableWidget,QTableWidgetItem, QSlider, QLabel, QGridLayout, QWidget, QLineEdit, QPushButton, QListWidget, QMessageBox
 from PyQt5.QtGui import QPixmap, QColor
 import RecommendationModel
 import GetSpotify
@@ -134,14 +134,29 @@ class MainWIndow(QWidget):
 
         print(sortedlist)
 
+        # Put sorted list into table
+
+        self.tableWidget = QTableWidget()
+
+        self.tableWidget.setRowCount(len(sortedlist))
+        self.tableWidget.setColumnCount(2)
+        self.tableWidget.setShowGrid(False)
+        self.tableWidget.setHorizontalHeaderLabels(('TITEL', 'MATCH'))
+
         for i in range(len(sortedlist)):
-            self.listWidget.insertItem(i, GetSpotify.song_name_display(
-                str(sortedlist[i][7])) + '    ' + str(sortedlist[i][8]))
+            self.tableWidget.setItem(i, 0, QTableWidgetItem(GetSpotify.song_name_display(str(sortedlist[i][7]))))
+            self.tableWidget.setItem(i, 1, QTableWidgetItem(str(sortedlist[i][8])))
 
-        self.listWidget.itemClicked.connect(lambda: self.item_click(self.listWidget.currentRow(), sortedlist))
 
+        #for i in range(len(sortedlist)):
+            #self.listWidget.insertItem(i, GetSpotify.song_name_display(
+                #str(sortedlist[i][7])) + '    ' + str(sortedlist[i][8]))
+
+        #self.listWidget.itemClicked.connect(lambda: self.item_click(self.listWidget.currentRow(), sortedlist))
+        self.tableWidget.itemClicked.connect(lambda: self.item_click(self.tableWidget.currentRow(), sortedlist))
         # Add List and Image to grid
-        self.grid.addWidget(self.listWidget, 10, 0, 2, 4)
+        #self.grid.addWidget(self.listWidget, 10, 0, 2, 4)
+        self.grid.addWidget(self.tableWidget, 10, 0, 2, 4)
         self.grid.addWidget(self.label, 2, 0, 7, 4)
 
         weights = VisualFeatureExtraction.create_hist(VisualFeatureExtraction.create_cluster(image,cluster_centers))
