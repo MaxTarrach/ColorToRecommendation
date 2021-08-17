@@ -76,6 +76,7 @@ class MainWIndow(QWidget):
         self.slider3.valueChanged.connect(self.updateLabel3)
 
         self.buttonSlider = QPushButton('Recalculate')
+        self.buttonSlider.clicked.connect(lambda: self.update_click(self.slider1.value(), self.slider2.value(), self.slider3.value()))
 
         self.sc = MplCanvas(self, width=4, height=4, dpi=50)
 
@@ -203,8 +204,11 @@ class MainWIndow(QWidget):
         self.textSlider2.setText('Laune ' + '(' + str(value) + ')')
 
     def updateLabel3(self, value):
-            self.textSlider3.setText('Laune ' + '(' + str(value) + ')')
+        self.textSlider3.setText('Laune ' + '(' + str(value) + ')')
 
+    def update_click(self, value1, value2, value3):
+        output = value1 + value2 + value3
+        print(output)
 
 
 if __name__ == '__main__':
