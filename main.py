@@ -54,21 +54,21 @@ class MainWIndow(QWidget):
 
         # sliders to canvase
 
-        self.textSlider1 = QLabel('Laune ' + '(0)')
+        self.textSlider1 = QLabel('Mood ' + '(0)')
         self.slider1 = QSlider(Qt.Horizontal, self)
         self.slider1.setRange(0, 100)
         self.slider1.setPageStep(5)
         self.slider1.setFocusPolicy(Qt.NoFocus)
         self.slider1.valueChanged.connect(self.updateLabel1)
 
-        self.textSlider2 = QLabel('Ruhe' + '(0)')
+        self.textSlider2 = QLabel('Intensity ' + '(0)')
         self.slider2 = QSlider(Qt.Horizontal, self)
         self.slider2.setRange(0, 100)
         self.slider2.setPageStep(5)
         self.slider2.setFocusPolicy(Qt.NoFocus)
         self.slider2.valueChanged.connect(self.updateLabel2)
 
-        self.textSlider3 = QLabel('Spannung' + '(0)')
+        self.textSlider3 = QLabel('Spannung ' + '(0)')
         self.slider3 = QSlider(Qt.Horizontal, self)
         self.slider3.setRange(0, 100)
         self.slider3.setPageStep(5)
@@ -197,14 +197,14 @@ class MainWIndow(QWidget):
 
     def updateLabel1(self, value):
 
-        self.textSlider1.setText('Laune ' + '(' + str(value) + ')')
+        self.textSlider1.setText('Mood ' + '(' + str(value) + ')')
 
     def updateLabel2(self, value):
 
-        self.textSlider2.setText('Laune ' + '(' + str(value) + ')')
+        self.textSlider2.setText('Intensity ' + '(' + str(value) + ')')
 
     def updateLabel3(self, value):
-        self.textSlider3.setText('Laune ' + '(' + str(value) + ')')
+        self.textSlider3.setText('Spannung ' + '(' + str(value) + ')')
 
     def update_click(self, value1, value2, value3):
         output = value1 + value2 + value3

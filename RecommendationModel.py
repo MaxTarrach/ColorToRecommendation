@@ -11,7 +11,7 @@ def normalize_songs(song_vectors):
 
         song_vectors[i, 1] = song_vectors[i, 1] / 11
         print(song_vectors[i, 2])
-        song_vectors[i, 2] = 1 - (song_vectors[i, 2] / -60)
+        song_vectors[i, 2] = 1 - ((song_vectors[i, 2] * - 1) / 60)
         print(song_vectors[i, 2])
         song_vectors[i, 5] = song_vectors[i, 5] / 160
 
@@ -20,42 +20,42 @@ def normalize_songs(song_vectors):
 
 def calculate_brightness_key(imageVector, songVectors, i):
 
-    brightness_key = (imageVector[4] - songVectors[i, 1])**2
+    brightness_key = (imageVector[4] - songVectors[i, 1])
 
     return brightness_key;
 
 
 def calculate_brightness_tempo(imageVector, songVectors, i):
 
-    brightness_tempo = (imageVector[4] - songVectors[i, 5]) ** 2
+    brightness_tempo = (imageVector[4] - songVectors[i, 5])
 
     return brightness_tempo
 
 
 def calculate_brightness_loudness(imageVector, songVectors, i):
 
-    brightness_loudness = (imageVector[4] - songVectors[i, 2]) ** 2
+    brightness_loudness = (imageVector[4] - songVectors[i, 2])
 
     return brightness_loudness
 
 
 def calculate_saturation_tempo(imageVector, songVectors, i):
 
-    saturation_tempo = (imageVector[3] - songVectors[i, 5]) ** 2
+    saturation_tempo = (imageVector[3] - songVectors[i, 5])
 
     return saturation_tempo;
 
 
 def calculate_blue_key(imageVector, songVectors, i):
 
-    blue_key = (imageVector[2] - songVectors[i, 1]) ** 2
+    blue_key = (imageVector[2] - songVectors[i, 1])
 
     return blue_key
 
 
 def calculate_yellow_energy(imageVector, songVectors, i):
 
-    yellow_energy = (imageVector[5] - songVectors[i, 0]) ** 2
+    yellow_energy = (imageVector[5] - songVectors[i, 0])
 
     return yellow_energy
 
@@ -99,24 +99,24 @@ def calculate_distances_2 (imageVector, songVectors):
     for i in range(len(songVectors)):
 
         brightness_key = abs(calculate_brightness_key(imageVector, songVectors, i))
-        print('brightness_key' +  str(brightness_key))
+
         brightness_tempo = abs(calculate_brightness_tempo(imageVector, songVectors, i))
-        print('brightness_tempo' + str(brightness_tempo))
+
         brightness_loudness = abs(calculate_brightness_loudness(imageVector, songVectors, i))
-        print('brightness_loudness' + str(brightness_loudness))
+
         saturation_tempo = abs(calculate_saturation_tempo(imageVector, songVectors, i))
         print('saturation_tempo' + str(saturation_tempo))
         blue_key = abs(calculate_blue_key(imageVector, songVectors, i))
-        print('blue_key' + str(blue_key))
+
         yellow_energy = abs(calculate_yellow_energy(imageVector, songVectors, i))
-        print('yellow_energy' + str(yellow_energy))
+
         color_mode = abs(calculate_color_mode(imageVector, songVectors, i))
-        print('color_mode' + str(color_mode))
+
         saturation_mode = abs(calculate_saturation_mode(imageVector, songVectors, i))
-        print('saturation_mode' + str(saturation_mode))
+
         brightness_mode = abs(calculate_brightness_mode(imageVector, songVectors, i))
-        print('brightness_mode' + str(brightness_mode))
-        distance = math.sqrt(brightness_key + brightness_tempo + brightness_loudness + saturation_tempo + 4 * blue_key + 4 * yellow_energy + 4 * color_mode + saturation_mode+ brightness_mode)
+
+        distance = math.sqrt(2 * brightness_key + 2 * brightness_tempo + 1 * brightness_loudness + saturation_tempo + 4 * blue_key + 4 * yellow_energy + 4 * color_mode + 1 * saturation_mode + 1* brightness_mode)
         print(distance)
         distance = 1 / (1 + distance)
 
