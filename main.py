@@ -76,7 +76,7 @@ class MainWIndow(QWidget):
         self.slider3.valueChanged.connect(self.updateLabel3)
 
         self.buttonSlider = QPushButton('Recalculate')
-        self.buttonSlider.clicked.connect(lambda: self.update_click(self.slider1.value(), self.slider2.value(), self.slider3.value()))
+        self.buttonSlider.clicked.connect(lambda: self.update_click(self.lineSpotifyLink.text(), self.slider1.value(), self.slider2.value(), self.slider3.value()))
 
         self.sc = MplCanvas(self, width=4, height=4, dpi=50)
 
@@ -204,12 +204,19 @@ class MainWIndow(QWidget):
         self.textSlider2.setText('Intensity ' + '(' + str(value) + ')')
 
     def updateLabel3(self, value):
-        self.textSlider3.setText('Spannung ' + '(' + str(value) + ')')
+        self.textSlider3.setText('Tempo ' + '(' + str(value) + ')')
 
-    def update_click(self, value1, value2, value3):
-        output = value1 + value2 + value3
-        print(output)
+    def update_click(self, playlist, mood, intensity, tempo):
 
+        sortedlist = RecommendationModel.getSliderList( playlist, mood, intensity, tempo)
+
+        for i in range(len(sortedlist)):
+            self.tableWidget.setItem(i, 0, QTableWidgetItem(GetSpotify.song_name_display(str(sortedlist[i][7]))))
+            self.tableWidget.setItem(i, 1, QTableWidgetItem(str(sortedlist[i][8])))
+
+        self.tableWidget.itemClicked.connect(lambda: self.item_click(self.tableWidget.currentRow(), sortedlist))
+
+        self.grid.addWidget(self.tableWidget, 10, 0, 2, 4)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

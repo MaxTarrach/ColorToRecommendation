@@ -5,6 +5,8 @@ from GetSpotify import *
 from VisualFeatureExtraction import *
 
 
+
+
 def normalize_songs(song_vectors):
 
     for i in range(len(song_vectors)):
@@ -124,6 +126,64 @@ def calculate_distances_2 (imageVector, songVectors):
 
     return distance_measures;
 
+# new distance measurements
+
+def calculate_distances_slider(imageVector, songVectors, mood, intensity, tempo):
+
+    distance_measures = []
+
+    for i in range(len(songVectors)):
+        # brightness_key = brightness key - (brightness_key * mood)
+        brightness_key = abs(calculate_brightness_key(imageVector, songVectors, i))
+
+        brightness_tempo = abs(calculate_brightness_tempo(imageVector, songVectors, i))
+
+        #tempo
+
+        brightness_tempo = brightness_tempo - (brightness_tempo * tempo)
+
+        brightness_loudness = abs(calculate_brightness_loudness(imageVector, songVectors, i))
+
+        saturation_tempo = abs(calculate_saturation_tempo(imageVector, songVectors, i))
+
+        # tempo
+
+        saturation_tempo = saturation_tempo - (saturation_tempo * tempo)
+
+        blue_key = abs(calculate_blue_key(imageVector, songVectors, i))
+
+        yellow_energy = abs(calculate_yellow_energy(imageVector, songVectors, i))
+
+        #intensity
+
+        yellow_energy = yellow_energy - (yellow_energy * intensity)
+
+        color_mode = abs(calculate_color_mode(imageVector, songVectors, i))
+
+        #mood
+        color_mode = color_mode - (color_mode * mood)
+
+        saturation_mode = abs(calculate_saturation_mode(imageVector, songVectors, i))
+
+        # mood
+        saturation_mode = saturation_mode - (saturation_mode * mood)
+
+        brightness_mode = abs(calculate_brightness_mode(imageVector, songVectors, i))
+
+        # mood
+        brightness_mode = brightness_mode - (brightness_mode * mood)
+
+        distance = math.sqrt(
+            2 * brightness_key + 2 * brightness_tempo + 1 * brightness_loudness + saturation_tempo + 4 * blue_key + 4 * yellow_energy + 4 * color_mode + 1 * saturation_mode + 1 * brightness_mode)
+
+        distance = 1 / (1+ distance)
+
+        distance_measures.append(distance)
+
+    return distance_measures;
+
+
+
 
 def sort_after_distances(songs, distances):
     a = numpy.array(distances)
@@ -154,6 +214,8 @@ def calculate_rating(sortedList):
 # Function to call from main that creates the sorted list we want to display
 def getSortedList(image, clusterCenters, playlist):
 
+    global visual_np
+
     # audio_df = GetSpotify.playlist(playlist)
     df_songs = get_song_features(playlist)
     # visual_df = VisualFeatureExtraction(image)
@@ -171,3 +233,21 @@ def getSortedList(image, clusterCenters, playlist):
     return sortedlist;
 
 
+def getSliderList( playlist, mood, intensity, tempo):
+
+    mood = mood / 100
+
+    intensity = intensity / 100
+
+    tempo = tempo / 100
+
+    df_songs = get_song_features(playlist)
+
+    songs_np = df_songs.to_numpy()
+
+    distances = calculate_distances_slider(visual_np, normalize_songs(songs_np), mood, intensity, tempo)
+
+    sortedlist = sort_after_distances(songs_np, distances)
+
+
+    return sortedlist
