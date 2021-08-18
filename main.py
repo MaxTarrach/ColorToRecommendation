@@ -68,7 +68,7 @@ class MainWIndow(QWidget):
         self.slider2.setFocusPolicy(Qt.NoFocus)
         self.slider2.valueChanged.connect(self.updateLabel2)
 
-        self.textSlider3 = QLabel('Spannung ' + '(0)')
+        self.textSlider3 = QLabel('Tempo ' + '(0)')
         self.slider3 = QSlider(Qt.Horizontal, self)
         self.slider3.setRange(0, 100)
         self.slider3.setPageStep(5)
@@ -153,7 +153,7 @@ class MainWIndow(QWidget):
 
         for i in range(len(sortedlist)):
             self.tableWidget.setItem(i, 0, QTableWidgetItem(GetSpotify.song_name_display(str(sortedlist[i][7]))))
-            self.tableWidget.setItem(i, 1, QTableWidgetItem(str(sortedlist[i][8])))
+            self.tableWidget.setItem(i, 1, QTableWidgetItem(RecommendationModel.calculate_rating(sortedlist[i][8])))
 
         self.tableWidget.itemClicked.connect(lambda: self.item_click(self.tableWidget.currentRow(), sortedlist))
 
@@ -161,10 +161,10 @@ class MainWIndow(QWidget):
         self.grid.addWidget(self.label, 2, 0, 7, 4)
 
         # Plot colors inside the gui:
-        self.label_plot_1 = QLabel(str(round(weights[0], 3)*100) + '%', self)
-        self.label_plot_2 = QLabel(str(round(weights[1], 3)*100) + '%', self)
-        self.label_plot_3 = QLabel(str(round(weights[2], 3)*100) + '%', self)
-        self.label_plot_4 = QLabel(str(round(weights[3], 3)*100) + '%', self)
+        self.label_plot_1 = QLabel(str(round(weights[0]*100, 2)) + '%', self)
+        self.label_plot_2 = QLabel(str(round(weights[1]*100, 2)) + '%', self)
+        self.label_plot_3 = QLabel(str(round(weights[2]*100, 2)) + '%', self)
+        self.label_plot_4 = QLabel(str(round(weights[3]*100, 2)) + '%', self)
 
         # 4 rgb values of color clustering
         colorValue1 = (colors[0][0], colors[0][1], colors[0][2])
@@ -212,7 +212,7 @@ class MainWIndow(QWidget):
 
         for i in range(len(sortedlist)):
             self.tableWidget.setItem(i, 0, QTableWidgetItem(GetSpotify.song_name_display(str(sortedlist[i][7]))))
-            self.tableWidget.setItem(i, 1, QTableWidgetItem(str(sortedlist[i][8])))
+            self.tableWidget.setItem(i, 1, QTableWidgetItem(RecommendationModel.calculate_rating(sortedlist[i][8])))
 
         self.tableWidget.itemClicked.connect(lambda: self.item_click(self.tableWidget.currentRow(), sortedlist))
 

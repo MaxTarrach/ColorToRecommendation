@@ -118,7 +118,7 @@ def calculate_distances_2 (imageVector, songVectors):
 
         brightness_mode = abs(calculate_brightness_mode(imageVector, songVectors, i))
 
-        distance = math.sqrt(2 * brightness_key + 2 * brightness_tempo + 1 * brightness_loudness + saturation_tempo + 4 * blue_key + 4 * yellow_energy + 4 * color_mode + 1 * saturation_mode + 1* brightness_mode)
+        distance = math.sqrt(0.5 * brightness_key + 0.5 * brightness_tempo + 0.25 * brightness_loudness + saturation_tempo + 1 * blue_key + 1 * yellow_energy + 1 * color_mode + 0.25 * saturation_mode + 0.25 * brightness_mode)
         print(distance)
         distance = 1 / (1 + distance)
 
@@ -205,10 +205,15 @@ def sort_after_distances(songs, distances):
 
 
 # Nicer to look at rating than just the pure distance
-def calculate_rating(sortedList):
-    ratings = []
+def calculate_rating(value):
 
-    return ratings;
+    value = round(value * 100)
+
+    value = str(value)
+
+    value = value + '%'
+
+    return value;
 
 
 # Function to call from main that creates the sorted list we want to display
