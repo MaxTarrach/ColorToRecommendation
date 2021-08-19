@@ -206,7 +206,7 @@ class MainWIndow(QWidget):
 
         self.sc = MplCanvas(self, width=4, height=4, dpi=50)
         self.sc.axes.plot(['Energy', 'Loudness', 'Valence', 'Tempo'], [sortedList[item_position][0],
-                                                                        sortedList[item_position][2],  sortedList[item_position][4] ,sortedList[item_position][5]])
+                                                                        sortedList[item_position][2],  sortedList[item_position][4] ,sortedList[item_position][5]], color='#37efba')
 
         self.chroma_key = QLabel('Key: ' + GetSpotify.get_song_key(sortedList[item_position][6]))
         self.mode = QLabel('Mode: ' + GetSpotify.get_song_mode(sortedList[item_position][3]))

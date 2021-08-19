@@ -5,16 +5,14 @@ from GetSpotify import *
 from VisualFeatureExtraction import *
 
 
-
-
 def normalize_songs(song_vectors):
 
     for i in range(len(song_vectors)):
 
         song_vectors[i, 1] = song_vectors[i, 1] / 11
-        print(song_vectors[i, 2])
+
         song_vectors[i, 2] = 1 - ((song_vectors[i, 2] * - 1) / 60)
-        print(song_vectors[i, 2])
+
         song_vectors[i, 5] = song_vectors[i, 5] / 160
 
     return song_vectors
@@ -22,42 +20,60 @@ def normalize_songs(song_vectors):
 
 def calculate_brightness_key(imageVector, songVectors, i):
 
-    brightness_key = (imageVector[4] - songVectors[i, 1])
+    brightness = imageVector[4]
+    key = songVectors[i, 1]
+
+    brightness_key = (brightness - key)
 
     return brightness_key;
 
 
 def calculate_brightness_tempo(imageVector, songVectors, i):
 
-    brightness_tempo = (imageVector[4] - songVectors[i, 5])
+    brightness = imageVector[4]
+    tempo = songVectors[i, 5]
+
+    brightness_tempo = (brightness - tempo)
 
     return brightness_tempo
 
 
 def calculate_brightness_loudness(imageVector, songVectors, i):
 
-    brightness_loudness = (imageVector[4] - songVectors[i, 2])
+    brightness = imageVector[4]
+    loudness = songVectors[i, 2]
+
+    brightness_loudness = (brightness - loudness)
 
     return brightness_loudness
 
 
 def calculate_saturation_tempo(imageVector, songVectors, i):
 
-    saturation_tempo = (imageVector[3] - songVectors[i, 5])
+    saturation = imageVector[3]
+    tempo = songVectors[i, 5]
+
+    saturation_tempo = (saturation - tempo)
 
     return saturation_tempo;
 
 
 def calculate_blue_key(imageVector, songVectors, i):
 
-    blue_key = (imageVector[2] - songVectors[i, 1])
+    blue = imageVector[2]
+    key = songVectors[i, 1]
+
+    blue_key = blue - (1 - key)
 
     return blue_key
 
 
 def calculate_yellow_energy(imageVector, songVectors, i):
 
-    yellow_energy = (imageVector[5] - songVectors[i, 0])
+    yellow = imageVector[5]
+    energy = songVectors[i, 0]
+
+    yellow_energy = (yellow - energy)
 
     return yellow_energy
 
@@ -65,21 +81,24 @@ def calculate_yellow_energy(imageVector, songVectors, i):
 def calculate_color_mode(imageVector, songVectors, i):
 
     mode = songVectors[i, 3]
+    blue = imageVector[2]
+    yellow = imageVector[5]
 
     if mode == 0:
-        color_mode = mode - imageVector[2]
+        color_mode = mode - (1 - yellow)
 
     else:
-        color_mode = mode - imageVector[5]
+        color_mode = mode - blue
 
     return color_mode;
 
 
 def calculate_saturation_mode(imageVector, songVectors, i):
 
+    saturation = imageVector[3]
     mode = songVectors[i, 3]
 
-    saturation_mode = mode - imageVector[3]
+    saturation_mode = mode - (1 - saturation)
 
     return saturation_mode;
 
@@ -89,9 +108,36 @@ def calculate_brightness_mode(imageVector, songVectors, i):
     mode = songVectors[i, 3]
     brightness = imageVector[4]
 
-    brightness_mode = mode - brightness
+    brightness_mode = mode - (1 - brightness)
 
     return brightness_mode
+
+def calculate_red_mode(imageVector, songVectors, i):
+
+    mode = songVectors[i, 3]
+    red = imageVector[0]
+
+    red_mode = mode - (1 - red)
+
+    return red_mode
+
+def calculate_green_mode(imageVector, songVectors, i):
+
+    mode = songVectors[i, 3]
+    green = imageVector[1]
+
+    green_mode = mode - green
+
+    return green_mode
+
+def calculate_blue_valence(imageVector, songVectors, i):
+
+    valence = songVectors[i, 4]
+    blue = imageVector[2]
+
+    blue_valence = blue - (1 - valence )
+
+    return blue_valence
 
 
 def calculate_distances_2 (imageVector, songVectors):
@@ -107,7 +153,7 @@ def calculate_distances_2 (imageVector, songVectors):
         brightness_loudness = abs(calculate_brightness_loudness(imageVector, songVectors, i))
 
         saturation_tempo = abs(calculate_saturation_tempo(imageVector, songVectors, i))
-        print('saturation_tempo' + str(saturation_tempo))
+
         blue_key = abs(calculate_blue_key(imageVector, songVectors, i))
 
         yellow_energy = abs(calculate_yellow_energy(imageVector, songVectors, i))
@@ -118,8 +164,14 @@ def calculate_distances_2 (imageVector, songVectors):
 
         brightness_mode = abs(calculate_brightness_mode(imageVector, songVectors, i))
 
-        distance = math.sqrt(0.5 * brightness_key + 0.5 * brightness_tempo + 0.25 * brightness_loudness + saturation_tempo + 1 * blue_key + 1 * yellow_energy + 1 * color_mode + 0.25 * saturation_mode + 0.25 * brightness_mode)
-        print(distance)
+        red_mode = abs(calculate_red_mode(imageVector, songVectors, i))
+
+        green_mode = abs(calculate_green_mode(imageVector, songVectors, i))
+
+        blue_valence = abs(calculate_blue_valence(imageVector, songVectors, i))
+
+        distance = math.sqrt(0.5 * brightness_key + 0.5 * brightness_tempo + 0.25 * brightness_loudness + saturation_tempo + 1 * blue_key + 1 * yellow_energy + 1 * color_mode + 0.25 * saturation_mode + 0.25 * brightness_mode + red_mode + green_mode + blue_valence)
+
         distance = 1 / (1 + distance)
 
         distance_measures.append(distance)
@@ -173,8 +225,13 @@ def calculate_distances_slider(imageVector, songVectors, mood, intensity, tempo)
         # mood
         brightness_mode = brightness_mode - (brightness_mode * mood)
 
-        distance = math.sqrt(
-            2 * brightness_key + 2 * brightness_tempo + 1 * brightness_loudness + saturation_tempo + 4 * blue_key + 4 * yellow_energy + 4 * color_mode + 1 * saturation_mode + 1 * brightness_mode)
+        red_mode = abs(calculate_red_mode(imageVector, songVectors, i))
+
+        green_mode = abs(calculate_green_mode(imageVector, songVectors, i))
+
+        blue_valence = abs(calculate_blue_valence(imageVector, songVectors, i))
+
+        distance = math.sqrt(0.5 * brightness_key + 0.5 * brightness_tempo + 0.25 * brightness_loudness + saturation_tempo + 1 * blue_key + 1 * yellow_energy + 1 * color_mode + 0.25 * saturation_mode + 0.25 * brightness_mode + red_mode + green_mode + blue_valence)
 
         distance = 1 / (1+ distance)
 
@@ -197,9 +254,9 @@ def sort_after_distances(songs, distances):
 
     added = numpy.append(songs, a_np, 1)
 
-    # sort array
+    sorted_songs = added[(-added[:,8]).argsort()]
 
-    sorted_songs = added[added[:, 8].argsort()]
+    #sorted_songs = added[added[:, 8].argsort()]
 
     return sorted_songs;
 
