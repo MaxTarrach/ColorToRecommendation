@@ -6,7 +6,7 @@ import  utils
 import numpy as np
 from main import *
 
-
+# Color Clustering based on input image. Fixed number of cluster_centers=4
 def create_cluster(filepath, cluster_centers):
     img = cv2.imread(filepath)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -19,16 +19,13 @@ def create_cluster(filepath, cluster_centers):
 
     return clt;
 
-
+# Histogram based on number of pixels in each cluster
 def create_hist(clt):
-    # grab the number of different clusters and create a histogram
-    # based on the number of pixels assigned to each cluster
     numLabels = np.arange(0, len(np.unique(clt.labels_)) + 1)
     (hist, _) = np.histogram(clt.labels_, bins=numLabels)
-    # normalize the histogram, such that it sums to one
     hist = hist.astype("float")
     hist /= hist.sum()
-    # return the histogram
+
     return hist
 
 
@@ -47,16 +44,11 @@ def reshape_imgdata(rgb_image):
     return img;
 
 
-# Convert RGB into HSV
-
-
 def convert_rgb_to_hsv(rgb_values):
 
     hsv_values = colorsys.rgb_to_hsv(rgb_values[0],rgb_values[1],rgb_values[2])
 
     return hsv_values;
-
-# Convert RGB into HLS
 
 
 def convert_rgb_to_hls(rgb_values):
@@ -64,8 +56,6 @@ def convert_rgb_to_hls(rgb_values):
 
     return hsl_values;
 
-
-# Grayscale image funktioniert!
 
 def convert_rgb_to_grayscale(rgb_values):
 
@@ -87,7 +77,7 @@ def get_brightness_value_of_rgb(filepath):
 
     return brightness;
 
-
+# combine the weighted cluster centers to one value
 def weighted_rgb_score(rgb_values, weights):
 
     red_value = rgb_values[0][0] * weights[0] + rgb_values[1][0] * weights[1] \
@@ -101,15 +91,10 @@ def weighted_rgb_score(rgb_values, weights):
 
     all_centers_rgb = [red_value, green_value, blue_value];
 
-    # (r0 * w0) + (r1 * w1) + (r2 * w2) + (r3 * w3) = rweighted
-    # (g0 * w0) + (g1 * w1) + (g2 * w2) + (g3 * w3) = gweighted
-    # (b0 * w0) + (b1 * w1) + (b2 * w2) + (b3 * w3) = bweighted
-
     return all_centers_rgb;
 
 
 # Get yellow value - intensity of yellow = rgb to cmyk and get brightness of only the y channel of the cmyk image
-
 def get_yellow_value_of_rgb(filepath):
 
     img = plt.imread(filepath)
@@ -138,23 +123,16 @@ def get_yellow_value_of_rgb(filepath):
     return yellow;
 
 
+# Add together every visual feature. Final output of VisualFeatureExtraction
 def features_image (filepath, clt, hist):
-
-    # rgb value
 
     rgb = weighted_rgb_score(clt, hist)
 
     rgb = utils.transfrom_255_to_1(rgb)
 
-    # saturation
-
     saturation = convert_rgb_to_hsv(rgb)[1]
 
-    # brightness
-
     brightness = get_brightness_value_of_rgb(filepath)
-
-    # yellow
 
     yellow = get_yellow_value_of_rgb(filepath)
 

@@ -17,6 +17,7 @@ from matplotlib.figure import Figure
 
 cluster_centers = 4
 
+# Class and style for the plots appearing on song click
 
 class MplCanvas(FigureCanvasQTAgg):
 
@@ -56,14 +57,11 @@ class MainWIndow(QWidget):
         self.lineSpotifyLink = QLineEdit(self)
         self.lineSpotifyLink.setPlaceholderText('Example: https://open.spotify.com/playlist/0cubuWEaRYj2CUCOSkfrIq?si=11af689f2d724676')
 
-        # GUI Spotify User ID?
-
         # GUI submit button
         self.buttonFileLoader = QPushButton('Compute')
         self.buttonFileLoader.clicked.connect(lambda: self.button_click(self.lineFileLoader.text(), self.lineSpotifyLink.text()))
 
-        # sliders to canvase
-
+        # sliders to canvas
         self.textSlider1 = QLabel('Mood ' + '(0)')
         self.slider1 = QSlider(Qt.Horizontal, self)
         self.slider1.setRange(0, 100)
@@ -85,13 +83,13 @@ class MainWIndow(QWidget):
         self.slider3.setFocusPolicy(Qt.NoFocus)
         self.slider3.valueChanged.connect(self.updateLabel3)
 
+        # Button to submit changes made through sliders
         self.buttonSlider = QPushButton('Recalculate')
         self.buttonSlider.clicked.connect(lambda: self.update_click(self.lineSpotifyLink.text(), self.slider1.value(), self.slider2.value(), self.slider3.value()))
 
+        # Placeholders for Canvas/ Table/ Image pre loading
         self.sc = MplCanvas(self, width=4, height=4, dpi=50)
-
         self.listWidget = QListWidget()
-
         placeholder = 'Assets/placeholder.jpg'
 
         #  Image load and label creation
@@ -102,31 +100,21 @@ class MainWIndow(QWidget):
         # Grid creation
         self.grid = QGridLayout()
 
-        # Add elements to grid
+        # Add elements to grid. All Elements are showing when application is started. No Input yet.
         self.grid.addWidget(self.textFileLoader, 0, 0, 1, 1)
         self.grid.addWidget(self.lineFileLoader, 0, 1, 1, 4)
-
         self.grid.addWidget(self.textSpotifyLoader, 1, 0, 1, 1)
         self.grid.addWidget(self.lineSpotifyLink, 1, 1, 1, 4)
-
         self.grid.addWidget(self.buttonFileLoader, 0, 5, 2, 1)
-
         self.grid.addWidget(self.label, 2, 0, 7, 4)
-
-        # Add slider to grid
         self.grid.addWidget(self.textSlider1, 2, 4, 2, 1)
         self.grid.addWidget(self.slider1, 3, 4, 2, 1)
-
         self.grid.addWidget(self.textSlider2, 4, 4, 2, 1)
         self.grid.addWidget(self.slider2, 5, 4, 2, 1)
-
         self.grid.addWidget(self.textSlider3, 6, 4, 2, 1)
         self.grid.addWidget(self.slider3, 7, 4, 2, 1)
-
         self.grid.addWidget(self.buttonSlider, 8, 4, 2, 1)
-
         self.grid.addWidget(self.listWidget, 10, 0, 2, 4)
-
         self.grid.addWidget(self.sc, 10, 4, 1, 2)
 
         self.setLayout(self.grid)
@@ -136,11 +124,15 @@ class MainWIndow(QWidget):
         self.setWindowTitle("Color to song recommendation")
         self.show()
 
-
+    '''Interaction events'''
     @pyqtSlot()
+
+    # Function triggered when 'compute' button is clicked
     def button_click(self, image, playlist):
 
+        # Results from Recommendation model
         sortedlist = RecommendationModel.getSortedList(image, cluster_centers, playlist)
+        # Results from Color-Clustering for display underneath image
         weights = VisualFeatureExtraction.create_hist(VisualFeatureExtraction.create_cluster(image, cluster_centers))
         colors = VisualFeatureExtraction.create_cluster(image, cluster_centers).cluster_centers_
 
@@ -151,10 +143,7 @@ class MainWIndow(QWidget):
 
         self.listWidget = QListWidget()
 
-        print(sortedlist)
-
-        # Put sorted list into table
-
+        # Table creation and styling
         self.tableWidget = QTableWidget()
 
         self.tableWidget.setRowCount(len(sortedlist))
@@ -166,11 +155,12 @@ class MainWIndow(QWidget):
         header.setSectionResizeMode(0, QHeaderView.Stretch)
         header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
 
-
+        # Filling the table with items from sortedlist (Results from the Recommendation Model)
         for i in range(len(sortedlist)):
             self.tableWidget.setItem(i, 0, QTableWidgetItem(GetSpotify.song_name_display(str(sortedlist[i][7]))))
             self.tableWidget.setItem(i, 1, QTableWidgetItem(RecommendationModel.calculate_rating(sortedlist[i][8])))
 
+        # Action when clicking on table row (Songs)
         self.tableWidget.itemClicked.connect(lambda: self.item_click(self.tableWidget.currentRow(), sortedlist))
 
         self.grid.addWidget(self.tableWidget, 10, 0, 2, 4)
@@ -202,30 +192,38 @@ class MainWIndow(QWidget):
         self.grid.addWidget(self.label_plot_3, 9, 2, 1, 1)
         self.grid.addWidget(self.label_plot_4, 9, 3, 1, 1)
 
+    # Function triggered when item in table is clicked
     def item_click(self, item_position, sortedList):
 
+        # Plotting the song with audio-features
         self.sc = MplCanvas(self, width=4, height=4, dpi=50)
         self.sc.axes.plot(['Energy', 'Loudness', 'Valence', 'Tempo'], [sortedList[item_position][0],
                                                                         sortedList[item_position][2],  sortedList[item_position][4] ,sortedList[item_position][5]], color='#37efba')
 
+        # Display Key and Mode underneath plot
         self.chroma_key = QLabel('Key: ' + GetSpotify.get_song_key(sortedList[item_position][6]))
         self.mode = QLabel('Mode: ' + GetSpotify.get_song_mode(sortedList[item_position][3]))
 
+        # Add Key/ Mode/ Plot to grid to display
         self.grid.addWidget(self.sc, 10, 4, 1, 2)
         self.grid.addWidget(self.chroma_key, 11, 4, 1, 1)
         self.grid.addWidget(self.mode, 11, 5, 1, 1)
 
+    # Function triggered when slider 'mood' is in use
     def updateLabel1(self, value):
 
         self.textSlider1.setText('Mood ' + '(' + str(value) + ')')
 
+    # Function triggered when slider 'intensity' is in use
     def updateLabel2(self, value):
 
         self.textSlider2.setText('Intensity ' + '(' + str(value) + ')')
 
+    # Function triggered when slider 'tempo' is in use
     def updateLabel3(self, value):
         self.textSlider3.setText('Tempo ' + '(' + str(value) + ')')
 
+    # Function triggered when button 'recalculate' is clicked
     def update_click(self, playlist, mood, intensity, tempo):
 
         sortedlist = RecommendationModel.getSliderList( playlist, mood, intensity, tempo)

@@ -1,10 +1,11 @@
+#imports
 import numpy
 import math
 from GetSpotify import *
 
 from VisualFeatureExtraction import *
 
-
+# Normalize audio features to get values between 0 and 1
 def normalize_songs(song_vectors):
 
     for i in range(len(song_vectors)):
@@ -17,6 +18,8 @@ def normalize_songs(song_vectors):
 
     return song_vectors
 
+
+'''functions with features from audio and visual context connected through emotions'''
 
 def calculate_brightness_key(imageVector, songVectors, i):
 
@@ -140,9 +143,15 @@ def calculate_blue_valence(imageVector, songVectors, i):
     return blue_valence
 
 
+# calculate euclidean distance between the image feature and the features of every song
 def calculate_distances_2 (imageVector, songVectors):
 
     distance_measures = []
+
+    # weights for different emotional features
+    factor_x_1 = 0.05
+    factor_x_2 = 0.1
+    factor_x_4 = 0.2
 
     for i in range(len(songVectors)):
 
@@ -170,7 +179,10 @@ def calculate_distances_2 (imageVector, songVectors):
 
         blue_valence = abs(calculate_blue_valence(imageVector, songVectors, i))
 
-        distance = math.sqrt(0.5 * brightness_key + 0.5 * brightness_tempo + 0.25 * brightness_loudness + saturation_tempo + 1 * blue_key + 1 * yellow_energy + 1 * color_mode + 0.25 * saturation_mode + 0.25 * brightness_mode + red_mode + green_mode + blue_valence)
+        distance = math.sqrt(factor_x_2 * brightness_key + factor_x_2 * brightness_tempo + factor_x_2 * brightness_loudness
+                             + factor_x_1 * saturation_tempo + factor_x_4 * blue_key + factor_x_4 * yellow_energy
+                             + factor_x_4 * color_mode + factor_x_1 * saturation_mode + factor_x_2 * brightness_mode
+                             + factor_x_4 * red_mode + factor_x_4 * green_mode + factor_x_4 * blue_valence)
 
         distance = 1 / (1 + distance)
 
@@ -178,11 +190,15 @@ def calculate_distances_2 (imageVector, songVectors):
 
     return distance_measures;
 
-# new distance measurements
-
+# calculate euclidean distance between the image feature and the features of every song
+# values of sliders are included
 def calculate_distances_slider(imageVector, songVectors, mood, intensity, tempo):
 
     distance_measures = []
+
+    factor_x_1 = 0.025
+    factor_x_2 = 0.05
+    factor_x_4 = 0.2
 
     for i in range(len(songVectors)):
         # brightness_key = brightness key - (brightness_key * mood)
@@ -190,15 +206,11 @@ def calculate_distances_slider(imageVector, songVectors, mood, intensity, tempo)
 
         brightness_tempo = abs(calculate_brightness_tempo(imageVector, songVectors, i))
 
-        #tempo
-
         brightness_tempo = brightness_tempo - (brightness_tempo * tempo)
 
         brightness_loudness = abs(calculate_brightness_loudness(imageVector, songVectors, i))
 
         saturation_tempo = abs(calculate_saturation_tempo(imageVector, songVectors, i))
-
-        # tempo
 
         saturation_tempo = saturation_tempo - (saturation_tempo * tempo)
 
@@ -206,23 +218,18 @@ def calculate_distances_slider(imageVector, songVectors, mood, intensity, tempo)
 
         yellow_energy = abs(calculate_yellow_energy(imageVector, songVectors, i))
 
-        #intensity
-
         yellow_energy = yellow_energy - (yellow_energy * intensity)
 
         color_mode = abs(calculate_color_mode(imageVector, songVectors, i))
 
-        #mood
         color_mode = color_mode - (color_mode * mood)
 
         saturation_mode = abs(calculate_saturation_mode(imageVector, songVectors, i))
 
-        # mood
         saturation_mode = saturation_mode - (saturation_mode * mood)
 
         brightness_mode = abs(calculate_brightness_mode(imageVector, songVectors, i))
 
-        # mood
         brightness_mode = brightness_mode - (brightness_mode * mood)
 
         red_mode = abs(calculate_red_mode(imageVector, songVectors, i))
@@ -231,17 +238,20 @@ def calculate_distances_slider(imageVector, songVectors, mood, intensity, tempo)
 
         blue_valence = abs(calculate_blue_valence(imageVector, songVectors, i))
 
-        distance = math.sqrt(0.5 * brightness_key + 0.5 * brightness_tempo + 0.25 * brightness_loudness + saturation_tempo + 1 * blue_key + 1 * yellow_energy + 1 * color_mode + 0.25 * saturation_mode + 0.25 * brightness_mode + red_mode + green_mode + blue_valence)
+        distance = math.sqrt(
+            factor_x_2 * brightness_key + factor_x_2 * brightness_tempo + factor_x_2 * brightness_loudness
+            + factor_x_1 * saturation_tempo + factor_x_4 * blue_key + factor_x_4 * yellow_energy
+            + factor_x_4 * color_mode + factor_x_1 * saturation_mode + factor_x_2 * brightness_mode
+            + factor_x_4 * red_mode + factor_x_4 * green_mode + factor_x_4 * blue_valence)
 
-        distance = 1 / (1+ distance)
+        distance = 1 / (1 + distance)
 
         distance_measures.append(distance)
 
     return distance_measures;
 
 
-
-
+# Prepare songs with distances to be displayed from most fitting to least
 def sort_after_distances(songs, distances):
     a = numpy.array(distances)
 
@@ -250,13 +260,9 @@ def sort_after_distances(songs, distances):
     for i in range(len(a)):
         a_np.append([a[i]])
 
-    # add distances to arrays
-
     added = numpy.append(songs, a_np, 1)
 
     sorted_songs = added[(-added[:,8]).argsort()]
-
-    #sorted_songs = added[added[:, 8].argsort()]
 
     return sorted_songs;
 
@@ -295,6 +301,8 @@ def getSortedList(image, clusterCenters, playlist):
     return sortedlist;
 
 
+# Function to call from main that creates the sorted list we want to display
+# Including Slider values
 def getSliderList( playlist, mood, intensity, tempo):
 
     mood = mood / 100
@@ -310,6 +318,5 @@ def getSliderList( playlist, mood, intensity, tempo):
     distances = calculate_distances_slider(visual_np, normalize_songs(songs_np), mood, intensity, tempo)
 
     sortedlist = sort_after_distances(songs_np, distances)
-
 
     return sortedlist

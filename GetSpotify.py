@@ -1,13 +1,8 @@
-# Spotify test
-
+#imports
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import pandas as np
-import re
-from pprint import pprint
-import json
 
-# get a playlist and get features needed for analysis
 
 clientID = 'ccc96fcbf06745cd83257810bec7192d'
 clientSecret = '18a8ee1b57b14c0cb1beceeeb82fd393'
@@ -30,7 +25,6 @@ def get_playlist_id(playlist_string):
 
 
 # get song ids from playlist
-
 def extract_song_ids(playlist_string):
 
     playlist = get_playlist_id(playlist_string)
@@ -49,9 +43,8 @@ def extract_song_ids(playlist_string):
 
     return array_of_ids;
 
+
 # Create a DataFrame with audio features from an array of song ids
-
-
 def get_song_features(playlist):
 
     playlist_id = get_playlist_id(playlist)
@@ -88,6 +81,7 @@ def get_song_features(playlist):
     return df
 
 
+# Display Song name in table in GUI
 def song_name_display(id):
 
     title = sp.track(id).get('name')
@@ -95,6 +89,7 @@ def song_name_display(id):
     return title;
 
 
+# Display Artist name in table in GUI
 def song_artist_display(id):
 
     name = sp.track(id).get('artist')
@@ -102,6 +97,7 @@ def song_artist_display(id):
     return name;
 
 
+# Display Song key beneath plot in GUI
 def get_song_key(song_chroma_key):
 
     song_chroma_key = str(song_chroma_key)
@@ -128,6 +124,7 @@ def get_song_key(song_chroma_key):
     return key;
 
 
+# Display Song mode beneath plot in GUI
 def get_song_mode(song_mode):
 
     song_mode = str(song_mode)
