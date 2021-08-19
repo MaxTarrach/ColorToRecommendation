@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow,QHBoxLayout, QTableWidget,QTableWidgetItem, QSlider, QLabel, QGridLayout, QWidget, QLineEdit, QPushButton, QListWidget, QMessageBox
+from PyQt5.QtWidgets import QApplication,QHeaderView,QTableView, QMainWindow,QHBoxLayout, QTableWidget,QTableWidgetItem, QSlider, QLabel, QGridLayout, QWidget, QLineEdit, QPushButton, QListWidget, QMessageBox
 from PyQt5.QtGui import QPixmap, QColor
 import RecommendationModel
 import GetSpotify
@@ -22,8 +22,16 @@ class MplCanvas(FigureCanvasQTAgg):
 
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         fig = Figure(figsize=(width, height), dpi =dpi)
+        fig.set_facecolor('#1e1d23')
         self.axes = fig.add_subplot(111)
+        self.axes.spines['bottom'].set_color('#FFFFFF')
+        self.axes.spines['left'].set_color('#FFFFFF')
+        self.axes.spines['top'].set_color('#FFFFFF')
+        self.axes.spines['right'].set_color('#FFFFFF')
+        self.axes.tick_params(axis='x', colors='#FFFFFF')
+        self.axes.tick_params(axis='y', colors='#FFFFFF')
         self.axes.set_ylim([0, 1])
+        self.axes.set_facecolor('#1e1d23')
         super(MplCanvas, self).__init__(fig)
 
 
@@ -31,6 +39,8 @@ class MainWIndow(QWidget):
 
     def __init__(self):
         super().__init__()
+
+        self.setStyleSheet('''background-color: #1e1d23;''')
 
         self.text1 = QLabel('Titel')
         self.text2 = QLabel('Interpret')
@@ -149,7 +159,13 @@ class MainWIndow(QWidget):
 
         self.tableWidget.setRowCount(len(sortedlist))
         self.tableWidget.setColumnCount(2)
-        self.tableWidget.setHorizontalHeaderLabels(('TITEL', 'MATCH'))
+        self.tableWidget.setHorizontalHeaderLabels(('TITEL', '    RATING    '))
+        self.tableWidget.setSelectionBehavior(QTableView.SelectRows)
+        header = self.tableWidget.horizontalHeader()
+
+        header.setSectionResizeMode(0, QHeaderView.Stretch)
+        header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
+
 
         for i in range(len(sortedlist)):
             self.tableWidget.setItem(i, 0, QTableWidgetItem(GetSpotify.song_name_display(str(sortedlist[i][7]))))
@@ -172,10 +188,14 @@ class MainWIndow(QWidget):
         colorValue3 = (colors[2][0], colors[2][1], colors[2][2])
         colorValue4 = (colors[3][0], colors[3][1], colors[3][2])
 
-        self.label_plot_1.setStyleSheet('background-color:rgb' + str(colorValue1) + '; border: 1px solid black; color: rgb(78, 253, 84)')
-        self.label_plot_2.setStyleSheet('background-color:rgb' + str(colorValue2) + '; border: 1px solid black; color: rgb(78, 253, 84)')
-        self.label_plot_3.setStyleSheet('background-color:rgb' + str(colorValue3) + '; border: 1px solid black; color: rgb(78, 253, 84)')
-        self.label_plot_4.setStyleSheet('background-color:rgb' + str(colorValue4) + '; border: 1px solid black; color: rgb(78, 253, 84)')
+        self.label_plot_1.setStyleSheet('background-color:rgb' + str(colorValue1) + '; border: 1px solid black; color: #04b97f')
+        self.label_plot_1.setAlignment(Qt.AlignCenter)
+        self.label_plot_2.setStyleSheet('background-color:rgb' + str(colorValue2) + '; border: 1px solid black; color: #04b97f')
+        self.label_plot_2.setAlignment(Qt.AlignCenter)
+        self.label_plot_3.setStyleSheet('background-color:rgb' + str(colorValue3) + '; border: 1px solid black; color: #04b97f')
+        self.label_plot_3.setAlignment(Qt.AlignCenter)
+        self.label_plot_4.setStyleSheet('background-color:rgb' + str(colorValue4) + '; border: 1px solid black; color: #04b97f')
+        self.label_plot_4.setAlignment(Qt.AlignCenter)
 
         self.grid.addWidget(self.label_plot_1, 9, 0, 1, 1)
         self.grid.addWidget(self.label_plot_2, 9, 1, 1, 1)
@@ -221,5 +241,11 @@ class MainWIndow(QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = MainWIndow()
+
+    File = open('Style/MaterialDark.qss', 'r')
+
+    with File:
+        qss = File.read()
+        app.setStyleSheet(qss)
 
     sys.exit(app.exec_())
