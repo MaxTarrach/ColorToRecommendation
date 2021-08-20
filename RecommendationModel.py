@@ -205,38 +205,36 @@ def calculate_distances_slider(imageVector, songVectors, mood, intensity, tempo)
         brightness_key = abs(calculate_brightness_key(imageVector, songVectors, i))
 
         brightness_tempo = abs(calculate_brightness_tempo(imageVector, songVectors, i))
-
-        brightness_tempo = brightness_tempo - (brightness_tempo * tempo)
+        brightness_tempo = brightness_tempo + (brightness_tempo * tempo)
 
         brightness_loudness = abs(calculate_brightness_loudness(imageVector, songVectors, i))
+        brightness_loudness = brightness_loudness + (brightness_loudness * intensity)
 
         saturation_tempo = abs(calculate_saturation_tempo(imageVector, songVectors, i))
-
-        saturation_tempo = saturation_tempo - (saturation_tempo * tempo)
+        saturation_tempo = saturation_tempo + (saturation_tempo * tempo)
 
         blue_key = abs(calculate_blue_key(imageVector, songVectors, i))
 
         yellow_energy = abs(calculate_yellow_energy(imageVector, songVectors, i))
-
         yellow_energy = yellow_energy - (yellow_energy * intensity)
 
         color_mode = abs(calculate_color_mode(imageVector, songVectors, i))
-
-        color_mode = color_mode - (color_mode * mood)
+        color_mode = color_mode + (color_mode * mood)
 
         saturation_mode = abs(calculate_saturation_mode(imageVector, songVectors, i))
-
-        saturation_mode = saturation_mode - (saturation_mode * mood)
+        saturation_mode = saturation_mode + (saturation_mode * mood)
 
         brightness_mode = abs(calculate_brightness_mode(imageVector, songVectors, i))
-
-        brightness_mode = brightness_mode - (brightness_mode * mood)
+        brightness_mode = brightness_mode + (brightness_mode * mood)
 
         red_mode = abs(calculate_red_mode(imageVector, songVectors, i))
+        red_mode = red_mode + (red_mode * mood)
 
         green_mode = abs(calculate_green_mode(imageVector, songVectors, i))
+        green_mode = green_mode + (green_mode * mood)
 
         blue_valence = abs(calculate_blue_valence(imageVector, songVectors, i))
+        blue_valence = blue_valence + (blue_valence * mood)
 
         distance = math.sqrt(
             factor_x_2 * brightness_key + factor_x_2 * brightness_tempo + factor_x_2 * brightness_loudness
