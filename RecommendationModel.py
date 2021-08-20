@@ -115,6 +115,7 @@ def calculate_brightness_mode(imageVector, songVectors, i):
 
     return brightness_mode
 
+
 def calculate_red_mode(imageVector, songVectors, i):
 
     mode = songVectors[i, 3]
@@ -124,6 +125,7 @@ def calculate_red_mode(imageVector, songVectors, i):
 
     return red_mode
 
+
 def calculate_green_mode(imageVector, songVectors, i):
 
     mode = songVectors[i, 3]
@@ -132,6 +134,7 @@ def calculate_green_mode(imageVector, songVectors, i):
     green_mode = mode - green
 
     return green_mode
+
 
 def calculate_blue_valence(imageVector, songVectors, i):
 
@@ -186,9 +189,12 @@ def calculate_distances_2 (imageVector, songVectors):
 
         distance = 1 / (1 + distance)
 
+        distance * 0.5
+
         distance_measures.append(distance)
 
     return distance_measures;
+
 
 # calculate euclidean distance between the image feature and the features of every song
 # values of sliders are included
@@ -243,6 +249,8 @@ def calculate_distances_slider(imageVector, songVectors, mood, intensity, tempo)
             + factor_x_4 * red_mode + factor_x_4 * green_mode + factor_x_4 * blue_valence)
 
         distance = 1 / (1 + distance)
+
+        distance * 1.5
 
         distance_measures.append(distance)
 
