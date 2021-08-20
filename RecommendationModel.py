@@ -189,8 +189,6 @@ def calculate_distances_2 (imageVector, songVectors):
 
         distance = 1 / (1 + distance)
 
-        distance * 0.5
-
         distance_measures.append(distance)
 
     return distance_measures;
@@ -249,8 +247,6 @@ def calculate_distances_slider(imageVector, songVectors, mood, intensity, tempo)
             + factor_x_4 * red_mode + factor_x_4 * green_mode + factor_x_4 * blue_valence)
 
         distance = 1 / (1 + distance)
-
-        distance * 1.5
 
         distance_measures.append(distance)
 
